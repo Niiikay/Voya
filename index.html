@@ -224,8 +224,12 @@
   <div class="modal-overlay hidden" id="apiModal">
     <div class="modal">
       <div class="modal-title">One quick setup</div>
-      <div class="modal-sub">VOYA needs a free Groq API key — no credit card needed, ever.<br><br>Get yours at <a href="https://console.groq.com" target="_blank">console.groq.com</a> &rarr; sign up &rarr; API Keys &rarr; Create API key.</div>
-      <div class="field"><label>Your Groq API key</label><input type="password" id="apiKeyInput" placeholder="gsk_..."/></div>
+      <div class="modal-sub">VOYA needs two free API keys — no credit card needed for either.<br><br>
+        <strong>1. Groq</strong> (AI engine) &rarr; <a href="https://console.groq.com" target="_blank">console.groq.com</a> &rarr; API Keys &rarr; Create key<br><br>
+        <strong>2. Pexels</strong> (photos) &rarr; <a href="https://www.pexels.com/api/" target="_blank">pexels.com/api</a> &rarr; sign up &rarr; Your API key
+      </div>
+      <div class="field"><label>Groq API key</label><input type="password" id="apiKeyInput" placeholder="gsk_..."/></div>
+      <div class="field"><label>Pexels API key</label><input type="password" id="pexelsKeyInput" placeholder="Your Pexels key..."/></div>
       <button class="btn-primary" onclick="saveKey()">Save &amp; continue &rarr;</button>
     </div>
   </div>
@@ -492,6 +496,8 @@ function doLogin(){
     if(!getKey()){
     document.getElementById("apiModal").classList.remove("hidden");
   }
+  const savedPexels=localStorage.getItem("voya_pexels_key");
+  if(savedPexels){const pe=document.getElementById("pexelsKeyInput");if(pe)pe.value=savedPexels;}
   }else{document.getElementById("loginError").style.display="block";}
 }
 document.addEventListener("keydown",e=>{if(e.key==="Enter"&&document.getElementById("loginScreen").classList.contains("active"))doLogin();});
@@ -501,6 +507,8 @@ function saveKey(){
   const k=document.getElementById("apiKeyInput").value.trim();
   if(!k.startsWith("gsk_")){alert("Groq keys start with gsk_ — double check!");return;}
   localStorage.setItem("voya_key",k);
+  const pk=document.getElementById("pexelsKeyInput").value.trim();
+  if(pk)localStorage.setItem("voya_pexels_key",pk);
   document.getElementById("apiModal").classList.add("hidden");
 }
 function getKey(){return localStorage.getItem("voya_key");}
@@ -619,25 +627,49 @@ Include 6 spots scored 1-10 (8+ is must-go). Be specific and local.`;
 
 function formatDate(d){return new Date(d+"T00:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});}
 
-function loadSpotPhotos(spots){
-  spots.forEach((s,i)=>{
+async function loadSpotPhotos(spots){
+  const PEXELS_KEY=localStorage.getItem("voya_pexels_key")||"";
+  if(!PEXELS_KEY){
+    spots.forEach((s,i)=>{
+      const imgEl=document.getElementById("simg-"+i);
+      if(imgEl)imgEl.src=`https://picsum.photos/seed/${encodeURIComponent(s.name+destination)}/700/360`;
+    });
+    return;
+  }
+  for(let i=0;i<spots.length;i++){
+    const s=spots[i];
     const imgEl=document.getElementById("simg-"+i);
     const attrEl=document.getElementById("sattr-"+i);
-    if(!imgEl)return;
-    // Use highly specific query: "La Jolla Cove San Diego California" for best match
-    const specificQuery=encodeURIComponent(`${s.name} ${destination} ${s.imgQ||""}`);
-    const fallbackQuery=encodeURIComponent(`${s.name} ${destination}`);
-    const destOnly=encodeURIComponent(destination);
-    imgEl.src=`https://source.unsplash.com/featured/700x360/?${specificQuery}`;
-    imgEl.onerror=function(){
-      this.onerror=function(){this.src=`https://source.unsplash.com/featured/700x360/?${destOnly}`;};
-      this.src=`https://source.unsplash.com/featured/700x360/?${fallbackQuery}`;
-    };
-    if(attrEl){
-      const unsplashSearch=`https://unsplash.com/s/photos/${encodeURIComponent(s.name+" "+destination)}?utm_source=voya&utm_medium=referral`;
-      attrEl.innerHTML=`<a href="${unsplashSearch}" target="_blank" style="color:#fff;text-decoration:none;opacity:0.9">Photo: Unsplash</a>`;
+    if(!imgEl)continue;
+    const queries=[
+      `${s.name} ${destination}`,
+      `${s.name}`,
+      `${destination} ${s.imgQ||s.type}`,
+      destination
+    ];
+    let loaded=false;
+    for(const q of queries){
+      if(loaded)break;
+      try{
+        const res=await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(q)}&per_page=3&orientation=landscape`,{headers:{Authorization:PEXELS_KEY}});
+        if(!res.ok)continue;
+        const data=await res.json();
+        if(data.photos&&data.photos.length>0){
+          const photo=data.photos[0];
+          imgEl.src=photo.src.landscape||photo.src.large;
+          if(attrEl){
+            attrEl.innerHTML=`<a href="${photo.photographer_url}?utm_source=voya" target="_blank" style="color:#fff;text-decoration:none;opacity:0.9">Photo: ${photo.photographer} / Pexels</a>`;
+          }
+          loaded=true;
+        }
+      }catch(e){continue;}
+      await new Promise(r=>setTimeout(r,100));
     }
-  });
+    if(!loaded&&imgEl){
+      imgEl.src=`https://picsum.photos/seed/${encodeURIComponent(s.name+destination)}/700/360`;
+      if(attrEl)attrEl.innerHTML="Photo: Lorem Picsum";
+    }
+  }
 }
 
 function renderResults(){
@@ -664,9 +696,8 @@ function renderResults(){
       <div class="spot-card" id="scard-${si}">
         <div style="position:relative">
           <img class="spot-img" id="simg-${si}"
-            src="https://source.unsplash.com/featured/700x360/?${encodeURIComponent(s.name+" "+destination+" "+s.imgQ)}"
+            src="https://picsum.photos/seed/${encodeURIComponent(s.name+destination)}/700/360"
             alt="${s.name}"
-            onerror="this.src='https://source.unsplash.com/featured/700x360/?${encodeURIComponent(s.name+" "+destination)}'"
           />
           <div id="sattr-${si}" style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.5);color:#fff;font-size:10px;padding:3px 8px;border-radius:4px;letter-spacing:0.03em">Photo: Unsplash</div>
         </div>
