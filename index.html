@@ -313,7 +313,126 @@
 </div>
 
 <script>
-const CITIES=["Abu Dhabi, UAE","Amsterdam, Netherlands","Athens, Greece","Auckland, New Zealand","Bangkok, Thailand","Barcelona, Spain","Beijing, China","Berlin, Germany","Bali, Indonesia","Buenos Aires, Argentina","Cairo, Egypt","Cancun, Mexico","Cape Town, South Africa","Chicago, Illinois","Copenhagen, Denmark","Dubai, UAE","Dublin, Ireland","Edinburgh, Scotland","Florence, Italy","Hong Kong","Honolulu, Hawaii","Istanbul, Turkey","Jakarta, Indonesia","Johannesburg, South Africa","Kyoto, Japan","Las Vegas, Nevada","Lisbon, Portugal","London, England","Los Angeles, California","Madrid, Spain","Maldives","Melbourne, Australia","Mexico City, Mexico","Miami, Florida","Milan, Italy","Montreal, Canada","Mumbai, India","Mykonos, Greece","Nairobi, Kenya","New Orleans, Louisiana","New York City, New York","Nice, France","Osaka, Japan","Paris, France","Phuket, Thailand","Prague, Czech Republic","Rio de Janeiro, Brazil","Rome, Italy","San Diego, California","San Francisco, California","Santorini, Greece","Seoul, South Korea","Shanghai, China","Singapore","Stockholm, Sweden","Sydney, Australia","Taipei, Taiwan","Tokyo, Japan","Toronto, Canada","Vancouver, Canada","Venice, Italy","Vienna, Austria","Zurich, Switzerland","Atlanta, Georgia","Austin, Texas","Boston, Massachusetts","Denver, Colorado","Houston, Texas","Nashville, Tennessee","Orlando, Florida","Seattle, Washington","Washington D.C.","Marrakech, Morocco","Havana, Cuba","Lima, Peru","Bogota, Colombia","Reykjavik, Iceland","Salzburg, Austria","Philadelphia, Pennsylvania","Phoenix, Arizona","Portland, Oregon"];
+const CITIES=[
+  // Alabama
+  "Birmingham, Alabama","Huntsville, Alabama","Mobile, Alabama","Montgomery, Alabama",
+  // Alaska
+  "Anchorage, Alaska","Fairbanks, Alaska","Juneau, Alaska","Sitka, Alaska",
+  // Arizona
+  "Flagstaff, Arizona","Mesa, Arizona","Phoenix, Arizona","Scottsdale, Arizona","Sedona, Arizona","Tempe, Arizona","Tucson, Arizona",
+  // Arkansas
+  "Fayetteville, Arkansas","Fort Smith, Arkansas","Little Rock, Arkansas",
+  // California
+  "Anaheim, California","Berkeley, California","Big Sur, California","Carmel, California","Fresno, California","Lake Tahoe, California","Long Beach, California","Los Angeles, California","Malibu, California","Monterey, California","Napa, California","Oakland, California","Palm Springs, California","Pasadena, California","Sacramento, California","San Diego, California","San Francisco, California","San Jose, California","Santa Barbara, California","Santa Cruz, California","Santa Monica, California","Sonoma, California","Yosemite, California",
+  // Colorado
+  "Aspen, Colorado","Boulder, Colorado","Colorado Springs, Colorado","Denver, Colorado","Fort Collins, Colorado","Telluride, Colorado","Vail, Colorado",
+  // Connecticut
+  "Hartford, Connecticut","New Haven, Connecticut","Stamford, Connecticut",
+  // Delaware
+  "Dover, Delaware","Wilmington, Delaware",
+  // Florida
+  "Boca Raton, Florida","Clearwater, Florida","Daytona Beach, Florida","Fort Lauderdale, Florida","Fort Myers, Florida","Gainesville, Florida","Jacksonville, Florida","Key West, Florida","Miami, Florida","Naples, Florida","Orlando, Florida","Panama City Beach, Florida","Pensacola, Florida","Sarasota, Florida","St. Augustine, Florida","St. Petersburg, Florida","Tallahassee, Florida","Tampa, Florida","West Palm Beach, Florida",
+  // Georgia
+  "Athens, Georgia","Atlanta, Georgia","Augusta, Georgia","Savannah, Georgia",
+  // Hawaii
+  "Hilo, Hawaii","Honolulu, Hawaii","Kailua-Kona, Hawaii","Lahaina, Hawaii","Lihue, Hawaii","Maui, Hawaii",
+  // Idaho
+  "Boise, Idaho","Coeur d'Alene, Idaho","Sun Valley, Idaho",
+  // Illinois
+  "Chicago, Illinois","Evanston, Illinois","Naperville, Illinois","Springfield, Illinois",
+  // Indiana
+  "Fort Wayne, Indiana","Indianapolis, Indiana","South Bend, Indiana",
+  // Iowa
+  "Des Moines, Iowa","Iowa City, Iowa",
+  // Kansas
+  "Kansas City, Kansas","Wichita, Kansas",
+  // Kentucky
+  "Lexington, Kentucky","Louisville, Kentucky",
+  // Louisiana
+  "Baton Rouge, Louisiana","New Orleans, Louisiana","Shreveport, Louisiana",
+  // Maine
+  "Bar Harbor, Maine","Portland, Maine",
+  // Maryland
+  "Annapolis, Maryland","Baltimore, Maryland","Bethesda, Maryland",
+  // Massachusetts
+  "Boston, Massachusetts","Cambridge, Massachusetts","Cape Cod, Massachusetts","Martha's Vineyard, Massachusetts","Nantucket, Massachusetts","Salem, Massachusetts","Springfield, Massachusetts","Worcester, Massachusetts",
+  // Michigan
+  "Ann Arbor, Michigan","Detroit, Michigan","Grand Rapids, Michigan","Traverse City, Michigan",
+  // Minnesota
+  "Duluth, Minnesota","Minneapolis, Minnesota","St. Paul, Minnesota",
+  // Mississippi
+  "Biloxi, Mississippi","Jackson, Mississippi",
+  // Missouri
+  "Kansas City, Missouri","St. Louis, Missouri",
+  // Montana
+  "Billings, Montana","Bozeman, Montana","Glacier, Montana","Missoula, Montana",
+  // Nebraska
+  "Lincoln, Nebraska","Omaha, Nebraska",
+  // Nevada
+  "Las Vegas, Nevada","Reno, Nevada",
+  // New Hampshire
+  "Concord, New Hampshire","Manchester, New Hampshire","Portsmouth, New Hampshire",
+  // New Jersey
+  "Atlantic City, New Jersey","Jersey City, New Jersey","Newark, New Jersey","Princeton, New Jersey",
+  // New Mexico
+  "Albuquerque, New Mexico","Santa Fe, New Mexico","Taos, New Mexico",
+  // New York
+  "Albany, New York","Buffalo, New York","Finger Lakes, New York","Hamptons, New York","New York City, New York","Niagara Falls, New York","Rochester, New York","Saratoga Springs, New York","Syracuse, New York",
+  // North Carolina
+  "Asheville, North Carolina","Chapel Hill, North Carolina","Charlotte, North Carolina","Durham, North Carolina","Outer Banks, North Carolina","Raleigh, North Carolina","Wilmington, North Carolina",
+  // North Dakota
+  "Bismarck, North Dakota","Fargo, North Dakota",
+  // Ohio
+  "Cincinnati, Ohio","Cleveland, Ohio","Columbus, Ohio","Dayton, Ohio",
+  // Oklahoma
+  "Oklahoma City, Oklahoma","Tulsa, Oklahoma",
+  // Oregon
+  "Bend, Oregon","Eugene, Oregon","Portland, Oregon","Salem, Oregon",
+  // Pennsylvania
+  "Gettysburg, Pennsylvania","Philadelphia, Pennsylvania","Pittsburgh, Pennsylvania",
+  // Rhode Island
+  "Newport, Rhode Island","Providence, Rhode Island",
+  // South Carolina
+  "Charleston, South Carolina","Columbia, South Carolina","Hilton Head, South Carolina","Myrtle Beach, South Carolina",
+  // South Dakota
+  "Mount Rushmore, South Dakota","Rapid City, South Dakota","Sioux Falls, South Dakota",
+  // Tennessee
+  "Chattanooga, Tennessee","Gatlinburg, Tennessee","Knoxville, Tennessee","Memphis, Tennessee","Nashville, Tennessee",
+  // Texas
+  "Austin, Texas","Dallas, Texas","El Paso, Texas","Fort Worth, Texas","Galveston, Texas","Houston, Texas","San Antonio, Texas","Waco, Texas",
+  // Utah
+  "Moab, Utah","Park City, Utah","Salt Lake City, Utah","St. George, Utah","Zion, Utah",
+  // Vermont
+  "Burlington, Vermont","Stowe, Vermont",
+  // Virginia
+  "Alexandria, Virginia","Charlottesville, Virginia","Norfolk, Virginia","Richmond, Virginia","Virginia Beach, Virginia","Williamsburg, Virginia",
+  // Washington
+  "Olympia, Washington","Seattle, Washington","Spokane, Washington","Tacoma, Washington",
+  // Washington D.C.
+  "Washington D.C.",
+  // West Virginia
+  "Charleston, West Virginia","Morgantown, West Virginia",
+  // Wisconsin
+  "Green Bay, Wisconsin","Madison, Wisconsin","Milwaukee, Wisconsin",
+  // Wyoming
+  "Cheyenne, Wyoming","Jackson, Wyoming","Yellowstone, Wyoming",
+  // International
+  "Abu Dhabi, UAE","Amsterdam, Netherlands","Athens, Greece","Auckland, New Zealand",
+  "Bangkok, Thailand","Barcelona, Spain","Beijing, China","Berlin, Germany",
+  "Bali, Indonesia","Buenos Aires, Argentina","Cairo, Egypt","Cancun, Mexico",
+  "Cape Town, South Africa","Copenhagen, Denmark","Dubai, UAE","Dublin, Ireland",
+  "Edinburgh, Scotland","Florence, Italy","Hong Kong","Istanbul, Turkey",
+  "Johannesburg, South Africa","Kyoto, Japan","Lisbon, Portugal","London, England",
+  "Madrid, Spain","Maldives","Melbourne, Australia","Mexico City, Mexico",
+  "Milan, Italy","Montreal, Canada","Mumbai, India","Mykonos, Greece",
+  "Osaka, Japan","Paris, France","Phuket, Thailand","Prague, Czech Republic",
+  "Rio de Janeiro, Brazil","Rome, Italy","Santorini, Greece","Seoul, South Korea",
+  "Shanghai, China","Singapore","Stockholm, Sweden","Sydney, Australia",
+  "Taipei, Taiwan","Tokyo, Japan","Toronto, Canada","Vancouver, Canada",
+  "Venice, Italy","Vienna, Austria","Zurich, Switzerland","Marrakech, Morocco",
+  "Havana, Cuba","Lima, Peru","Bogota, Colombia","Reykjavik, Iceland",
+  "Nairobi, Kenya","Budapest, Hungary","Dubrovnik, Croatia","Cartagena, Colombia",
+];
 
 const M1_INTERESTS=[
   {id:"photography",label:"Photography",desc:"Spots, light & angles"},
@@ -482,6 +601,7 @@ Include 6 spots scored 1-10 (8+ is must-go). Be specific and local.`;
     const d=await r.json();if(d.error)throw new Error(d.error.message);
     result=JSON.parse(d.choices[0].message.content.replace(/```json|```/g,"").trim());
     clearInterval(loadingInterval);renderResults();
+    setTimeout(()=>loadSpotPhotos(result.spots||[]),400);
   }catch(err){
     clearInterval(loadingInterval);
     let msg = err.message;
@@ -498,6 +618,27 @@ Include 6 spots scored 1-10 (8+ is must-go). Be specific and local.`;
 }
 
 function formatDate(d){return new Date(d+"T00:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});}
+
+function loadSpotPhotos(spots){
+  spots.forEach((s,i)=>{
+    const imgEl=document.getElementById("simg-"+i);
+    const attrEl=document.getElementById("sattr-"+i);
+    if(!imgEl)return;
+    // Use highly specific query: "La Jolla Cove San Diego California" for best match
+    const specificQuery=encodeURIComponent(`${s.name} ${destination} ${s.imgQ||""}`);
+    const fallbackQuery=encodeURIComponent(`${s.name} ${destination}`);
+    const destOnly=encodeURIComponent(destination);
+    imgEl.src=`https://source.unsplash.com/featured/700x360/?${specificQuery}`;
+    imgEl.onerror=function(){
+      this.onerror=function(){this.src=`https://source.unsplash.com/featured/700x360/?${destOnly}`;};
+      this.src=`https://source.unsplash.com/featured/700x360/?${fallbackQuery}`;
+    };
+    if(attrEl){
+      const unsplashSearch=`https://unsplash.com/s/photos/${encodeURIComponent(s.name+" "+destination)}?utm_source=voya&utm_medium=referral`;
+      attrEl.innerHTML=`<a href="${unsplashSearch}" target="_blank" style="color:#fff;text-decoration:none;opacity:0.9">Photo: Unsplash</a>`;
+    }
+  });
+}
 
 function renderResults(){
   document.getElementById("loadingView").style.display="none";
@@ -519,9 +660,16 @@ function renderResults(){
     <div class="chip-wrap">${(result.packing||[]).map(p=>`<span class="chip">${p}</span>`).join("")}</div>
     ${result.outfitNote?`<div class="outfit-note">Style note: ${result.outfitNote}</div>`:""}
     <div class="section-label">Top spots &middot; scored by local recommendation frequency</div>
-    ${(result.spots||[]).map(s=>`
-      <div class="spot-card">
-        <img class="spot-img" src="https://source.unsplash.com/featured/700x360/?${encodeURIComponent(destination+","+s.imgQ)}" alt="${s.name}" onerror="this.src='https://picsum.photos/seed/${encodeURIComponent(s.name+destination)}/700/360'"/>
+    ${(result.spots||[]).map((s,si)=>`
+      <div class="spot-card" id="scard-${si}">
+        <div style="position:relative">
+          <img class="spot-img" id="simg-${si}"
+            src="https://source.unsplash.com/featured/700x360/?${encodeURIComponent(s.name+" "+destination+" "+s.imgQ)}"
+            alt="${s.name}"
+            onerror="this.src='https://source.unsplash.com/featured/700x360/?${encodeURIComponent(s.name+" "+destination)}'"
+          />
+          <div id="sattr-${si}" style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.5);color:#fff;font-size:10px;padding:3px 8px;border-radius:4px;letter-spacing:0.03em">Photo: Unsplash</div>
+        </div>
         <div class="spot-body">
           <div class="spot-header">
             <div>${s.mustVisit?`<div class="must-badge">Must visit</div>`:""}<div class="spot-name">${s.name}</div><div class="spot-type">${s.type} &middot; ${s.tag}</div></div>
