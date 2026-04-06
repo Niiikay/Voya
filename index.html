@@ -8,113 +8,69 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --blue-50: #E6F1FB;
-      --blue-100: #B5D4F4;
-      --blue-600: #185FA5;
-      --blue-800: #0C447C;
-      --blue-900: #042C53;
-      --teal-50: #E1F5EE;
-      --teal-100: #9FE1CB;
-      --teal-600: #0F6E56;
-      --teal-800: #085041;
-      --gray-50: #F7FAFB;
-      --gray-100: #EEF2F7;
-      --gray-200: #DDE3EA;
-      --gray-400: #8FA3B1;
-      --gray-600: #546E7A;
-      --gray-900: #0D1B2A;
+      --blue-50: #E6F1FB; --blue-100: #B5D4F4; --blue-600: #185FA5;
+      --blue-800: #0C447C; --blue-900: #042C53;
+      --teal-50: #E1F5EE; --teal-100: #9FE1CB; --teal-600: #0F6E56; --teal-800: #085041;
+      --gray-50: #F7FAFB; --gray-100: #EEF2F7; --gray-200: #DDE3EA;
+      --gray-400: #8FA3B1; --gray-600: #546E7A; --gray-900: #0D1B2A;
       --font-display: 'Cormorant Garamond', Georgia, serif;
       --font-body: 'DM Sans', system-ui, sans-serif;
-      --radius-sm: 8px;
-      --radius-md: 12px;
-      --radius-lg: 16px;
+      --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px;
     }
+    body { font-family: var(--font-body); background: #fff; color: var(--gray-900); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+    .screen { display: none; }
+    .screen.active { display: block; }
 
-    body {
-      font-family: var(--font-body);
-      background: #ffffff;
-      color: var(--gray-900);
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-    }
+    .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; background: var(--gray-50); }
+    .login-box { background: #fff; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); padding: 2.5rem 2rem; max-width: 400px; width: 100%; text-align: center; }
+    .login-mark { font-family: var(--font-display); font-size: 28px; letter-spacing: 0.3em; color: var(--gray-900); margin-bottom: 6px; }
+    .login-tag { font-size: 13px; color: var(--gray-400); margin-bottom: 2rem; }
+    .login-hint { background: var(--blue-50); border: 1px solid var(--blue-100); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1.5rem; text-align: left; }
+    .login-hint-label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue-600); margin-bottom: 8px; font-weight: 500; }
+    .login-hint-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; }
+    .login-hint-key { color: var(--gray-600); }
+    .login-hint-val { font-weight: 500; color: var(--blue-800); }
+    .login-error { font-size: 13px; color: #C62828; margin-top: 10px; display: none; }
 
-    /* ── API Key Modal ── */
-    .modal-overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.4);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 100; padding: 1rem;
-    }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 1rem; }
     .modal-overlay.hidden { display: none; }
-    .modal {
-      background: #fff;
-      border-radius: var(--radius-lg);
-      padding: 2rem;
-      max-width: 420px; width: 100%;
-      border: 1px solid var(--gray-200);
-    }
+    .modal { background: #fff; border-radius: var(--radius-lg); padding: 2rem; max-width: 420px; width: 100%; border: 1px solid var(--gray-200); }
     .modal-title { font-family: var(--font-display); font-size: 24px; font-weight: 400; margin-bottom: 8px; }
     .modal-sub { font-size: 14px; color: var(--gray-600); line-height: 1.6; margin-bottom: 1.5rem; }
     .modal-sub a { color: var(--blue-600); text-decoration: none; }
-    .modal-sub a:hover { text-decoration: underline; }
 
-    /* ── Layout ── */
     .app { max-width: 560px; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; }
     .wordmark { font-family: var(--font-display); font-size: 18px; font-weight: 400; letter-spacing: 0.25em; color: var(--gray-900); margin-bottom: 2.5rem; display: flex; justify-content: space-between; align-items: center; }
     .settings-btn { font-size: 12px; color: var(--gray-400); cursor: pointer; background: none; border: none; font-family: var(--font-body); }
     .settings-btn:hover { color: var(--gray-600); }
-
-    /* ── Step dots ── */
     .dots { display: flex; gap: 5px; align-items: center; margin-bottom: 2rem; }
     .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gray-200); }
     .dot-active { width: 18px; height: 5px; border-radius: 3px; background: var(--blue-600); }
-
-    /* ── Typography ── */
     .heading { font-family: var(--font-display); font-size: 36px; font-weight: 400; line-height: 1.18; color: var(--gray-900); margin-bottom: 10px; }
     .subtext { font-size: 15px; color: var(--gray-600); line-height: 1.65; margin-bottom: 2rem; }
     .section-label { font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gray-400); margin: 1.5rem 0 0.75rem; }
 
-    /* ── Form ── */
-    .field { margin-bottom: 1rem; }
+    .field { margin-bottom: 1rem; position: relative; }
     .field label { display: block; font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray-400); margin-bottom: 6px; }
-    input[type="text"], input[type="date"], input[type="password"] {
-      width: 100%; padding: 11px 14px;
-      border: 1px solid var(--gray-200);
-      border-radius: var(--radius-sm);
-      font-size: 15px; font-family: var(--font-body);
-      color: var(--gray-900); background: var(--gray-50);
-      outline: none; transition: border-color 0.15s;
-    }
+    input[type="text"], input[type="date"], input[type="password"] { width: 100%; padding: 11px 14px; border: 1px solid var(--gray-200); border-radius: var(--radius-sm); font-size: 15px; font-family: var(--font-body); color: var(--gray-900); background: var(--gray-50); outline: none; transition: border-color 0.15s; }
     input:focus { border-color: var(--blue-600); background: #fff; box-shadow: 0 0 0 3px rgba(24,95,165,0.08); }
     .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1.75rem; }
 
-    /* ── Buttons ── */
-    .btn-primary {
-      display: block; width: 100%; padding: 12px;
-      background: var(--blue-600); color: #fff;
-      border: none; border-radius: var(--radius-sm);
-      font-family: var(--font-body); font-size: 14px; font-weight: 500;
-      cursor: pointer; transition: background 0.15s;
-    }
+    .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; z-index: 50; background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius-sm); margin-top: 2px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); max-height: 200px; overflow-y: auto; }
+    .autocomplete-item { padding: 10px 14px; font-size: 14px; color: var(--gray-900); cursor: pointer; border-bottom: 1px solid var(--gray-100); display: flex; align-items: center; gap: 8px; }
+    .autocomplete-item:last-child { border-bottom: none; }
+    .autocomplete-item:hover { background: var(--blue-50); color: var(--blue-800); }
+    .ac-sub { font-size: 12px; color: var(--gray-400); margin-left: auto; }
+
+    .btn-primary { display: block; width: 100%; padding: 12px; background: var(--blue-600); color: #fff; border: none; border-radius: var(--radius-sm); font-family: var(--font-body); font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.15s; }
     .btn-primary:hover { background: var(--blue-800); }
     .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
-    .btn-ghost {
-      background: none; border: none; font-family: var(--font-body);
-      font-size: 13px; color: var(--gray-600); cursor: pointer;
-      padding: 0; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 5px;
-    }
+    .btn-ghost { background: none; border: none; font-family: var(--font-body); font-size: 13px; color: var(--gray-600); cursor: pointer; padding: 0; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 5px; }
     .btn-ghost:hover { color: var(--gray-900); }
 
-    /* ── Interest cards ── */
     .interests-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 2rem; }
-    .interest-card {
-      background: #fff; border: 1px solid var(--gray-200);
-      border-radius: var(--radius-md); padding: 14px 16px;
-      cursor: pointer; transition: border-color 0.15s;
-      user-select: none;
-    }
+    .interest-card { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius-md); padding: 14px 16px; cursor: pointer; transition: border-color 0.15s; user-select: none; }
     .interest-card:hover { border-color: var(--gray-400); }
     .interest-card.selected { border: 1.5px solid var(--blue-600); background: var(--blue-50); }
     .int-label { font-size: 14px; font-weight: 500; color: var(--gray-900); margin-bottom: 3px; }
@@ -122,51 +78,24 @@
     .int-desc { font-size: 12px; color: var(--gray-600); }
     .interest-card.selected .int-desc { color: var(--blue-600); }
 
-    /* ── Loading ── */
     .loading-screen { text-align: center; padding: 5rem 2rem; }
     .loading-dest { font-family: var(--font-display); font-size: 26px; color: var(--gray-900); margin-bottom: 1.25rem; }
-    .spinner {
-      width: 28px; height: 28px;
-      border: 1.5px solid var(--gray-200);
-      border-top-color: var(--blue-600);
-      border-radius: 50%;
-      animation: spin 0.9s linear infinite;
-      margin: 0 auto 1rem;
-    }
+    .spinner { width: 28px; height: 28px; border: 1.5px solid var(--gray-200); border-top-color: var(--blue-600); border-radius: 50%; animation: spin 0.9s linear infinite; margin: 0 auto 1rem; }
     .loading-msg { font-size: 14px; color: var(--gray-600); }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── Hero card ── */
-    .hero-card {
-      background: var(--blue-50); border: 1px solid var(--blue-100);
-      border-radius: var(--radius-lg); padding: 1.4rem 1.5rem;
-      margin-bottom: 1.25rem;
-    }
+    .hero-card { background: var(--blue-50); border: 1px solid var(--blue-100); border-radius: var(--radius-lg); padding: 1.4rem 1.5rem; margin-bottom: 1.25rem; }
     .dest-name { font-family: var(--font-display); font-size: 32px; font-weight: 400; color: var(--blue-900); margin-bottom: 3px; }
-    .dest-dates { font-size: 12px; color: var(--blue-600); letter-spacing: 0.05em; margin-bottom: 12px; }
+    .dest-route { font-size: 12px; color: var(--blue-600); letter-spacing: 0.04em; margin-bottom: 3px; }
+    .dest-dates { font-size: 12px; color: var(--blue-600); letter-spacing: 0.04em; margin-bottom: 12px; }
     .vibe-text { font-size: 14px; color: var(--blue-800); line-height: 1.75; margin-bottom: 14px; }
-    .weather-pill {
-      display: inline-flex; align-items: center; gap: 7px;
-      background: #fff; border: 1px solid var(--blue-100);
-      border-radius: 20px; padding: 5px 14px;
-      font-size: 13px; color: var(--blue-600);
-    }
+    .weather-pill { display: inline-flex; align-items: center; gap: 7px; background: #fff; border: 1px solid var(--blue-100); border-radius: 20px; padding: 5px 14px; font-size: 13px; color: var(--blue-600); }
 
-    /* ── Packing ── */
     .chip-wrap { display: flex; flex-wrap: wrap; gap: 7px; }
-    .chip {
-      background: var(--blue-50); border: 1px solid var(--blue-100);
-      border-radius: 20px; padding: 4px 13px;
-      font-size: 13px; color: var(--blue-800);
-    }
+    .chip { background: var(--blue-50); border: 1px solid var(--blue-100); border-radius: 20px; padding: 4px 13px; font-size: 13px; color: var(--blue-800); }
     .outfit-note { font-size: 13px; color: var(--teal-600); margin-top: 10px; font-style: italic; }
 
-    /* ── Spot cards ── */
-    .spot-card {
-      background: #fff; border: 1px solid var(--gray-200);
-      border-radius: var(--radius-lg); overflow: hidden;
-      margin-bottom: 12px;
-    }
+    .spot-card { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 12px; }
     .spot-img { width: 100%; height: 175px; object-fit: cover; display: block; background: var(--gray-100); }
     .spot-body { padding: 1rem 1.2rem; }
     .spot-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px; }
@@ -176,421 +105,381 @@
     .photo-tip { background: var(--teal-50); border-radius: var(--radius-sm); padding: 8px 11px; font-size: 12px; color: var(--teal-800); }
     .score-badge { font-size: 12px; font-weight: 500; background: var(--teal-50); color: var(--teal-800); border-radius: var(--radius-sm); padding: 3px 9px; white-space: nowrap; }
     .score-badge.must-visit { background: var(--teal-600); color: var(--teal-50); }
-    .must-badge {
-      display: inline-block; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
-      background: var(--blue-600); color: var(--blue-50);
-      border-radius: 4px; padding: 2px 7px; margin-bottom: 5px;
-    }
+    .must-badge { display: inline-block; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; background: var(--blue-600); color: var(--blue-50); border-radius: 4px; padding: 2px 7px; margin-bottom: 5px; }
 
-    /* ── Info boxes ── */
-    .info-box {
-      background: var(--teal-50); border: 1px solid var(--teal-100);
-      border-radius: var(--radius-lg); padding: 1rem 1.2rem;
-      margin-top: 10px;
-    }
+    .info-box { background: var(--teal-50); border: 1px solid var(--teal-100); border-radius: var(--radius-lg); padding: 1rem 1.2rem; margin-top: 10px; }
     .info-label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--teal-600); margin-bottom: 6px; }
     .info-text { font-size: 13px; color: var(--teal-800); line-height: 1.65; }
 
-    /* ── Help section ── */
     .help-section { margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--gray-100); }
     .help-heading { font-family: var(--font-display); font-size: 24px; font-weight: 400; color: var(--gray-900); margin-bottom: 1rem; }
     .help-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .help-btn {
-      background: #fff; border: 1px solid var(--gray-200);
-      border-radius: var(--radius-md); padding: 1rem;
-      cursor: pointer; text-align: left; width: 100%;
-      transition: border-color 0.15s, background 0.15s;
-    }
+    .help-btn { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius-md); padding: 1rem; cursor: pointer; text-align: left; width: 100%; transition: border-color 0.15s, background 0.15s; }
     .help-btn:hover { border-color: var(--gray-400); background: var(--gray-50); }
     .help-btn-label { font-size: 14px; font-weight: 500; color: var(--gray-900); }
     .help-btn-sub { font-size: 12px; color: var(--gray-600); margin-top: 3px; }
-    .coming-soon {
-      background: var(--gray-50); border: 1px solid var(--gray-200);
-      border-radius: var(--radius-sm); padding: 1rem; margin-top: 12px;
-      font-size: 13px; color: var(--gray-600); display: none;
-    }
+    .coming-soon { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-sm); padding: 1rem; margin-top: 12px; font-size: 13px; color: var(--gray-600); display: none; }
     .coming-soon strong { color: var(--blue-600); }
-
-    /* ── Error ── */
     .error-msg { text-align: center; padding: 3rem 1rem; font-size: 14px; color: #C62828; }
 
-    /* ── Responsive ── */
     @media (max-width: 480px) {
       .app { padding: 2rem 1rem 4rem; }
       .heading { font-size: 30px; }
       .row-2 { grid-template-columns: 1fr; }
-      .interests-grid { grid-template-columns: 1fr 1fr; }
     }
   </style>
 </head>
 <body>
 
-  <!-- API Key Modal -->
-  <div class="modal-overlay" id="apiModal">
-    <div class="modal">
-      <div class="modal-title">Welcome to VOYA</div>
-      <div class="modal-sub">
-        To power the AI, you need a free Groq API key — no credit card, ever.<br><br>
-        Get yours at <a href="https://console.groq.com" target="_blank">console.groq.com</a> → 
-        sign up → API Keys → Create API key.<br><br>
-        Your key is stored only in your browser session and never sent anywhere except Google.
+  <!-- LOGIN -->
+  <div id="loginScreen" class="screen active">
+    <div class="login-wrap">
+      <div class="login-box">
+        <div class="login-mark">VOYA</div>
+        <div class="login-tag">Your AI travel companion</div>
+        <div class="login-hint">
+          <div class="login-hint-label">Demo credentials</div>
+          <div class="login-hint-row">
+            <span class="login-hint-key">Username</span>
+            <span class="login-hint-val">SunscreenForgetter99</span>
+          </div>
+          <div class="login-hint-row">
+            <span class="login-hint-key">Password</span>
+            <span class="login-hint-val">passport123</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Username</label>
+          <input type="text" id="loginUser" placeholder="Enter username" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input type="password" id="loginPass" placeholder="Enter password" />
+        </div>
+        <button class="btn-primary" onclick="doLogin()">Sign in &rarr;</button>
+        <div class="login-error" id="loginError">Hmm, that's not right — check the hint above!</div>
       </div>
-      <div class="field">
-        <label>Your Groq API key</label>
-        <input type="password" id="apiKeyInput" placeholder="gsk_..." />
-      </div>
-      <button class="btn-primary" onclick="saveKey()">Get started &rarr;</button>
     </div>
   </div>
 
-  <!-- Main App -->
-  <div class="app">
+  <!-- MAIN APP -->
+  <div id="appScreen" class="screen">
 
-    <!-- STEP 0: Destination -->
-    <div id="step0">
-      <div class="wordmark">
-        VOYA
-        <button class="settings-btn" onclick="document.getElementById('apiModal').classList.remove('hidden')">
-          Change API key
-        </button>
-      </div>
-      <div class="dots">
-        <div class="dot-active"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-      </div>
-      <h1 class="heading">Where are<br>you headed?</h1>
-      <p class="subtext">AI-powered travel intelligence for every kind of explorer.</p>
-
-      <div class="field">
-        <label>Destination</label>
-        <input type="text" id="dest" placeholder="e.g. San Diego, California" />
-      </div>
-      <div class="row-2">
-        <div class="field">
-          <label>Departure</label>
-          <input type="date" id="dateFrom" />
+    <div class="modal-overlay hidden" id="apiModal">
+      <div class="modal">
+        <div class="modal-title">One quick setup</div>
+        <div class="modal-sub">
+          VOYA needs a free Groq API key — no credit card needed, ever.<br><br>
+          Get yours at <a href="https://console.groq.com" target="_blank">console.groq.com</a> &rarr; sign up &rarr; API Keys &rarr; Create API key.
         </div>
         <div class="field">
-          <label>Return</label>
-          <input type="date" id="dateTo" />
+          <label>Your Groq API key</label>
+          <input type="password" id="apiKeyInput" placeholder="gsk_..." />
         </div>
+        <button class="btn-primary" onclick="saveKey()">Save &amp; continue &rarr;</button>
       </div>
-      <button class="btn-primary" id="btnNext0" onclick="goToStep1()" disabled>Continue &rarr;</button>
     </div>
 
-    <!-- STEP 1: Interests -->
-    <div id="step1" style="display:none">
-      <div class="wordmark">VOYA</div>
-      <div class="dots">
-        <div class="dot"></div>
-        <div class="dot-active"></div>
-        <div class="dot"></div>
+    <div class="app">
+
+      <!-- Step 0 -->
+      <div id="step0">
+        <div class="wordmark">
+          VOYA
+          <button class="settings-btn" onclick="document.getElementById('apiModal').classList.remove('hidden')">Change API key</button>
+        </div>
+        <div class="dots"><div class="dot-active"></div><div class="dot"></div><div class="dot"></div></div>
+        <h1 class="heading">Where are<br>you headed?</h1>
+        <p class="subtext">AI-powered travel intelligence for every kind of explorer.</p>
+
+        <div class="field">
+          <label>Flying from</label>
+          <input type="text" id="flyingFrom" placeholder="e.g. Chicago, Illinois" autocomplete="off" oninput="acSearch(this,'fromList')" />
+          <div class="autocomplete-list" id="fromList" style="display:none"></div>
+        </div>
+
+        <div class="field">
+          <label>Destination</label>
+          <input type="text" id="dest" placeholder="e.g. San Diego, California" autocomplete="off" oninput="acSearch(this,'destList')" />
+          <div class="autocomplete-list" id="destList" style="display:none"></div>
+        </div>
+
+        <div class="row-2">
+          <div class="field">
+            <label>Arriving</label>
+            <input type="date" id="dateFrom" onchange="validateStep0()" />
+          </div>
+          <div class="field">
+            <label>Departing</label>
+            <input type="date" id="dateTo" onchange="validateStep0()" />
+          </div>
+        </div>
+        <button class="btn-primary" id="btnNext0" onclick="goToStep1()" disabled>Continue &rarr;</button>
       </div>
-      <button class="btn-ghost" onclick="goToStep0()">&#8592; Back</button>
-      <h1 class="heading">What moves<br>you?</h1>
-      <p class="subtext">Select your interests — every recommendation will be tailored to match.</p>
-      <div class="interests-grid" id="interestsGrid"></div>
-      <button class="btn-primary" onclick="analyze()">Analyze my trip &rarr;</button>
-    </div>
 
-    <!-- STEP 2: Results -->
-    <div id="step2" style="display:none">
-      <div class="wordmark">VOYA</div>
-
-      <!-- Loading -->
-      <div id="loadingView" class="loading-screen">
-        <div class="loading-dest" id="loadingDest"></div>
-        <div class="spinner"></div>
-        <div class="loading-msg" id="loadingMsg">Scanning local posts...</div>
+      <!-- Step 1 -->
+      <div id="step1" style="display:none">
+        <div class="wordmark">VOYA</div>
+        <div class="dots"><div class="dot"></div><div class="dot-active"></div><div class="dot"></div></div>
+        <button class="btn-ghost" onclick="goToStep0()">&#8592; Back</button>
+        <h1 class="heading">What moves<br>you?</h1>
+        <p class="subtext">Select your interests — every recommendation will be tailored to match.</p>
+        <div class="interests-grid" id="interestsGrid"></div>
+        <button class="btn-primary" onclick="analyze()">Analyze my trip &rarr;</button>
       </div>
 
-      <!-- Results -->
-      <div id="resultsView" style="display:none"></div>
-    </div>
+      <!-- Step 2 -->
+      <div id="step2" style="display:none">
+        <div class="wordmark">VOYA</div>
+        <div id="loadingView" class="loading-screen">
+          <div class="loading-dest" id="loadingDest"></div>
+          <div class="spinner"></div>
+          <div class="loading-msg" id="loadingMsg">Scanning local posts...</div>
+        </div>
+        <div id="resultsView" style="display:none"></div>
+      </div>
 
+    </div>
   </div>
 
   <script>
-    // ── Data ──
+    const CITIES = [
+      "Abu Dhabi, UAE","Amsterdam, Netherlands","Athens, Greece","Auckland, New Zealand",
+      "Bangkok, Thailand","Barcelona, Spain","Beijing, China","Berlin, Germany",
+      "Bali, Indonesia","Buenos Aires, Argentina","Cairo, Egypt","Cancun, Mexico",
+      "Cape Town, South Africa","Chicago, Illinois","Copenhagen, Denmark",
+      "Dubai, UAE","Dublin, Ireland","Edinburgh, Scotland","Florence, Italy",
+      "Hong Kong","Honolulu, Hawaii","Istanbul, Turkey","Jakarta, Indonesia",
+      "Johannesburg, South Africa","Kyoto, Japan","Las Vegas, Nevada","Lisbon, Portugal",
+      "London, England","Los Angeles, California","Madrid, Spain","Maldives",
+      "Melbourne, Australia","Mexico City, Mexico","Miami, Florida","Milan, Italy",
+      "Montreal, Canada","Mumbai, India","Mykonos, Greece","Nairobi, Kenya",
+      "New Orleans, Louisiana","New York City, New York","Nice, France","Osaka, Japan",
+      "Paris, France","Phuket, Thailand","Prague, Czech Republic","Rio de Janeiro, Brazil",
+      "Rome, Italy","San Diego, California","San Francisco, California","Santorini, Greece",
+      "Seoul, South Korea","Shanghai, China","Singapore","Stockholm, Sweden",
+      "Sydney, Australia","Taipei, Taiwan","Tokyo, Japan","Toronto, Canada",
+      "Vancouver, Canada","Venice, Italy","Vienna, Austria","Zurich, Switzerland",
+      "Atlanta, Georgia","Austin, Texas","Boston, Massachusetts","Denver, Colorado",
+      "Houston, Texas","Nashville, Tennessee","Orlando, Florida","Seattle, Washington",
+      "Washington D.C.","Marrakech, Morocco","Havana, Cuba","Lima, Peru",
+      "Bogota, Colombia","Cartagena, Colombia","Reykjavik, Iceland","Salzburg, Austria",
+      "Detroit, Michigan","Philadelphia, Pennsylvania","Phoenix, Arizona","Portland, Oregon",
+    ];
+
     const INTERESTS = [
-      { id: "photography", label: "Photography", desc: "Spots, light & angles" },
-      { id: "food",        label: "Food & Drink",  desc: "Local eats & hidden gems" },
-      { id: "nightlife",   label: "Nightlife",      desc: "Bars, clubs & evenings" },
-      { id: "culture",     label: "Culture & History", desc: "Museums, art & landmarks" },
-      { id: "nature",      label: "Nature & Outdoors", desc: "Parks, hikes & views" },
-      { id: "shopping",    label: "Shopping",       desc: "Markets & boutiques" },
-      { id: "adventure",   label: "Adventure",      desc: "Thrills & active experiences" },
-      { id: "local",       label: "Local Vibes",    desc: "Events & neighborhood life" },
+      { id: "photography", label: "Photography",      desc: "Spots, light & angles" },
+      { id: "food",        label: "Food & Drink",     desc: "Local eats & hidden gems" },
+      { id: "nightlife",   label: "Nightlife",        desc: "Bars, clubs & evenings" },
+      { id: "culture",     label: "Culture & History",desc: "Museums, art & landmarks" },
+      { id: "nature",      label: "Nature & Outdoors",desc: "Parks, hikes & views" },
+      { id: "shopping",    label: "Shopping",         desc: "Markets & boutiques" },
+      { id: "adventure",   label: "Adventure",        desc: "Thrills & active experiences" },
+      { id: "local",       label: "Local Vibes",      desc: "Events & neighborhood life" },
     ];
-
-    const LOADING_MSGS = [
-      "Scanning local posts & reels...",
-      "Reading weather patterns...",
-      "Scoring must-visit spots...",
-      "Curating your travel intel...",
-    ];
-
+    const LOADING_MSGS = ["Scanning local posts & reels...","Reading weather patterns...","Scoring must-visit spots...","Curating your travel intel..."];
     const HELP_OPTIONS = [
-      { id: "flights",     label: "Book flights",   sub: "Find best deals",      module: 6 },
-      { id: "hotels",      label: "Hotels & stays", sub: "Filter & compare",     module: 4 },
-      { id: "itinerary",   label: "Plan itinerary", sub: "Optimize your route",  module: 2 },
-      { id: "experiences", label: "Experiences",    sub: "Local events & tickets", module: 5 },
+      { id:"flights",     label:"Book flights",   sub:"Find best deals",        module:6 },
+      { id:"hotels",      label:"Hotels & stays", sub:"Filter & compare",       module:4 },
+      { id:"itinerary",   label:"Plan itinerary", sub:"Optimize your route",    module:2 },
+      { id:"experiences", label:"Experiences",    sub:"Local events & tickets",  module:5 },
     ];
 
-    // ── State ──
-    let selectedInterests = [];
-    let destination = "", dateFrom = "", dateTo = "", result = null;
-    let loadingInterval = null, loadingIdx = 0;
+    let selectedInterests=[], destination="", flyingFrom="", dateFrom="", dateTo="", result=null;
+    let loadingInterval=null, loadingIdx=0, acTimer=null;
 
-    // ── API Key ──
-    function saveKey() {
-      const key = document.getElementById("apiKeyInput").value.trim();
-      if (!key.startsWith("gsk_")) { alert("That doesn't look like a valid Groq API key. It should start with gsk_"); return; }
-      sessionStorage.setItem("voya_api_key", key);
-      document.getElementById("apiModal").classList.add("hidden");
+    function doLogin() {
+      const u = document.getElementById("loginUser").value.trim();
+      const p = document.getElementById("loginPass").value.trim();
+      if (u === "SunscreenForgetter99" && p === "passport123") {
+        document.getElementById("loginScreen").classList.remove("active");
+        document.getElementById("appScreen").classList.add("active");
+        if (!getKey()) document.getElementById("apiModal").classList.remove("hidden");
+      } else {
+        document.getElementById("loginError").style.display = "block";
+      }
     }
-
-    function getKey() { return sessionStorage.getItem("voya_api_key"); }
-
-    // ── Check if key exists on load ──
-    window.addEventListener("load", () => {
-      if (getKey()) document.getElementById("apiModal").classList.add("hidden");
-      buildInterestsGrid();
-      setupInputListeners();
+    document.addEventListener("keydown", e => {
+      if (e.key === "Enter" && document.getElementById("loginScreen").classList.contains("active")) doLogin();
     });
 
-    // ── Build interests grid ──
-    function buildInterestsGrid() {
-      const grid = document.getElementById("interestsGrid");
-      INTERESTS.forEach(interest => {
-        const card = document.createElement("div");
-        card.className = "interest-card";
-        card.id = "card-" + interest.id;
-        card.innerHTML = `<div class="int-label">${interest.label}</div><div class="int-desc">${interest.desc}</div>`;
-        card.addEventListener("click", () => {
-          if (selectedInterests.includes(interest.id)) {
-            selectedInterests = selectedInterests.filter(x => x !== interest.id);
-          } else {
-            selectedInterests.push(interest.id);
-          }
-          card.classList.toggle("selected", selectedInterests.includes(interest.id));
-        });
-        grid.appendChild(card);
-      });
+    function saveKey() {
+      const key = document.getElementById("apiKeyInput").value.trim();
+      if (!key.startsWith("gsk_")) { alert("Groq keys start with gsk_ — double check and try again!"); return; }
+      sessionStorage.setItem("voya_key", key);
+      document.getElementById("apiModal").classList.add("hidden");
+    }
+    function getKey() { return sessionStorage.getItem("voya_key"); }
+
+    function acSearch(input, listId) {
+      clearTimeout(acTimer);
+      const val = input.value.trim();
+      const list = document.getElementById(listId);
+      if (val.length < 3) { list.style.display = "none"; validateStep0(); return; }
+      acTimer = setTimeout(() => {
+        const matches = CITIES.filter(c => c.toLowerCase().includes(val.toLowerCase())).slice(0, 7);
+        if (!matches.length) { list.style.display = "none"; return; }
+        const isFrom = listId === "fromList";
+        list.innerHTML = matches.map(m => {
+          const [city, ...rest] = m.split(",");
+          const country = rest.join(",").trim();
+          return `<div class="autocomplete-item" onclick="pickCity('${input.id}','${listId}',\`${m}\`)">
+            <span style="font-size:13px">${isFrom ? "✈" : "📍"}</span>
+            <span>${city}</span>
+            ${country ? `<span class="ac-sub">${country}</span>` : ""}
+          </div>`;
+        }).join("");
+        list.style.display = "block";
+      }, 160);
+      validateStep0();
     }
 
-    // ── Input listeners ──
-    function setupInputListeners() {
-      ["dest", "dateFrom", "dateTo"].forEach(id => {
-        const el = document.getElementById(id);
-        el.addEventListener(id === "dest" ? "input" : "change", validateStep0);
-      });
+    function pickCity(inputId, listId, value) {
+      document.getElementById(inputId).value = value;
+      document.getElementById(listId).style.display = "none";
+      validateStep0();
     }
+
+    document.addEventListener("click", e => {
+      ["fromList","destList"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el && !el.contains(e.target) && e.target.id !== (id === "fromList" ? "flyingFrom" : "dest")) {
+          el.style.display = "none";
+        }
+      });
+    });
 
     function validateStep0() {
+      flyingFrom = document.getElementById("flyingFrom").value.trim();
       destination = document.getElementById("dest").value.trim();
       dateFrom = document.getElementById("dateFrom").value;
       dateTo = document.getElementById("dateTo").value;
-      document.getElementById("btnNext0").disabled = !(destination && dateFrom && dateTo);
+      document.getElementById("btnNext0").disabled = !(flyingFrom && destination && dateFrom && dateTo);
     }
 
-    // ── Navigation ──
-    function goToStep1() {
-      document.getElementById("step0").style.display = "none";
-      document.getElementById("step1").style.display = "block";
-    }
+    window.addEventListener("load", () => {
+      const grid = document.getElementById("interestsGrid");
+      INTERESTS.forEach(i => {
+        const card = document.createElement("div");
+        card.className = "interest-card"; card.id = "card-" + i.id;
+        card.innerHTML = `<div class="int-label">${i.label}</div><div class="int-desc">${i.desc}</div>`;
+        card.addEventListener("click", () => {
+          selectedInterests.includes(i.id) ? selectedInterests = selectedInterests.filter(x => x !== i.id) : selectedInterests.push(i.id);
+          card.classList.toggle("selected", selectedInterests.includes(i.id));
+        });
+        grid.appendChild(card);
+      });
+    });
 
-    function goToStep0() {
-      document.getElementById("step1").style.display = "none";
-      document.getElementById("step0").style.display = "block";
-    }
+    function goToStep1() { document.getElementById("step0").style.display="none"; document.getElementById("step1").style.display="block"; }
+    function goToStep0() { document.getElementById("step1").style.display="none"; document.getElementById("step0").style.display="block"; }
 
     function restart() {
-      destination = ""; dateFrom = ""; dateTo = "";
-      selectedInterests = []; result = null;
-      document.getElementById("step2").style.display = "none";
-      document.getElementById("step0").style.display = "block";
-      document.getElementById("dest").value = "";
-      document.getElementById("dateFrom").value = "";
-      document.getElementById("dateTo").value = "";
-      document.getElementById("btnNext0").disabled = true;
-      INTERESTS.forEach(i => document.getElementById("card-" + i.id)?.classList.remove("selected"));
-      selectedInterests = [];
+      flyingFrom=""; destination=""; dateFrom=""; dateTo=""; selectedInterests=[]; result=null;
+      document.getElementById("step2").style.display="none";
+      document.getElementById("step0").style.display="block";
+      ["flyingFrom","dest","dateFrom","dateTo"].forEach(id => document.getElementById(id).value="");
+      document.getElementById("btnNext0").disabled=true;
+      INTERESTS.forEach(i => document.getElementById("card-"+i.id)?.classList.remove("selected"));
     }
 
-    // ── Analyze ──
     async function analyze() {
       if (!getKey()) { document.getElementById("apiModal").classList.remove("hidden"); return; }
-
-      document.getElementById("step1").style.display = "none";
-      document.getElementById("step2").style.display = "block";
-      document.getElementById("loadingDest").textContent = destination;
-      document.getElementById("loadingView").style.display = "block";
-      document.getElementById("resultsView").style.display = "none";
+      document.getElementById("step1").style.display="none";
+      document.getElementById("step2").style.display="block";
+      document.getElementById("loadingDest").textContent=destination;
+      document.getElementById("loadingView").style.display="block";
+      document.getElementById("resultsView").style.display="none";
 
       loadingInterval = setInterval(() => {
-        loadingIdx = (loadingIdx + 1) % LOADING_MSGS.length;
+        loadingIdx = (loadingIdx+1) % LOADING_MSGS.length;
         document.getElementById("loadingMsg").textContent = LOADING_MSGS[loadingIdx];
       }, 1800);
 
       const interests = selectedInterests.length ? selectedInterests.join(", ") : "general travel";
+      const prompt = `Travel AI for VOYA app. User flying from ${flyingFrom} to ${destination}. Arrives ${dateFrom}, departs ${dateTo}. Interests: ${interests}.
 
-      const prompt = `Travel AI for VOYA app. User is traveling to ${destination} from ${dateFrom} to ${dateTo}. Their interests: ${interests}.
-
-Return ONLY valid JSON with no markdown, no backticks, no extra text:
-{
-  "vibe": "2-sentence atmospheric description of ${destination} during this season",
-  "weather": "brief historical weather pattern for these specific dates",
-  "temp": "temperature range like 68-82F / 20-28C",
-  "packing": ["6-8 specific packing items as short strings"],
-  "outfitNote": "one sentence on outfit style for this trip",
-  "spots": [
-    {
-      "name": "Place name",
-      "type": "food|nightlife|nature|culture|shopping|adventure|photography|experience",
-      "tag": "one word like iconic/hidden/scenic/vibey",
-      "desc": "2 sentences on why it is special and worth visiting",
-      "score": 9,
-      "mustVisit": true,
-      "photoTip": "specific photography or content creator tip for this spot",
-      "imgQ": "2-3 word search term for an image of this specific place"
-    }
-  ],
-  "contentTip": "best single photography or content creation tip for ${destination}",
-  "eventsNote": "what seasonal events or local experiences to look for during this time"
-}
-
-Include exactly 6 spots relevant to the user's interests. Score 1-10 by how frequently locals and travelers recommend it (8+ = must-go). Be specific and local, not generic.`;
+Return ONLY valid JSON, no markdown, no backticks:
+{"vibe":"2-sentence atmospheric description of ${destination} this season","weather":"brief historical weather for these dates","temp":"temp range like 68-82F","packing":["6-8 packing items"],"outfitNote":"one sentence outfit style note","spots":[{"name":"Place","type":"food|nightlife|nature|culture|shopping|adventure|photography|experience","tag":"one word","desc":"2 sentences why special","score":9,"mustVisit":true,"photoTip":"specific photo/content tip","imgQ":"2-3 word image search"}],"contentTip":"best content creator tip for ${destination}","eventsNote":"seasonal events to look for"}
+Include 6 spots scored 1-10 by local recommendation frequency (8+ is must-go). Be specific and local.`;
 
       try {
-        const response = await fetch(
-          "https://api.groq.com/openai/v1/chat/completions",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${getKey()}`
-            },
-            body: JSON.stringify({
-              model: "llama-3.3-70b-versatile",
-              messages: [{ role: "user", content: prompt }],
-              temperature: 0.7,
-              max_tokens: 1500
-            })
-          }
-        );
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${getKey()}` },
+          body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{ role: "user", content: prompt }], temperature: 0.7, max_tokens: 1500 })
+        });
         const data = await response.json();
         if (data.error) throw new Error(data.error.message);
-        const text = data.choices[0].message.content;
-        result = JSON.parse(text.replace(/```json|```/g, "").trim());
+        result = JSON.parse(data.choices[0].message.content.replace(/```json|```/g,"").trim());
         clearInterval(loadingInterval);
         renderResults();
-      } catch (err) {
+      } catch(err) {
         clearInterval(loadingInterval);
-        document.getElementById("loadingView").innerHTML = `<div class="error-msg">
-          <p>Something went wrong: ${err.message}</p>
-          <br>
-          <button class="btn-ghost" onclick="restart()" style="margin:0 auto">&#8592; Try again</button>
-        </div>`;
+        document.getElementById("loadingView").innerHTML=`<div class="error-msg"><p>Something went wrong: ${err.message}</p><br><button class="btn-ghost" onclick="restart()" style="margin:0 auto">&#8592; Try again</button></div>`;
       }
     }
 
-    // ── Format date ──
-    function formatDate(d) {
-      return new Date(d + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-    }
+    function formatDate(d) { return new Date(d+"T00:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}); }
 
-    // ── Render results ──
     function renderResults() {
-      document.getElementById("loadingView").style.display = "none";
+      document.getElementById("loadingView").style.display="none";
       const rv = document.getElementById("resultsView");
-      rv.style.display = "block";
-
-      rv.innerHTML = `
-        <div class="dots">
-          <div class="dot"></div><div class="dot"></div><div class="dot-active"></div>
-        </div>
+      rv.style.display="block";
+      rv.innerHTML=`
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot-active"></div></div>
         <button class="btn-ghost" onclick="restart()">&#8592; Start over</button>
-
         <div class="hero-card">
           <div class="dest-name">${destination}</div>
-          <div class="dest-dates">${formatDate(dateFrom)} &rarr; ${formatDate(dateTo)}</div>
+          <div class="dest-route">${flyingFrom} &rarr; ${destination}</div>
+          <div class="dest-dates">Arriving ${formatDate(dateFrom)} &middot; Departing ${formatDate(dateTo)}</div>
           <div class="vibe-text">${result.vibe}</div>
           <div class="weather-pill">
             <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
               <circle cx="6.5" cy="6.5" r="3" fill="#185FA5"/>
-              <circle cx="6.5" cy="1" r="1.2" fill="#185FA5"/>
-              <circle cx="6.5" cy="12" r="1.2" fill="#185FA5"/>
-              <circle cx="1" cy="6.5" r="1.2" fill="#185FA5"/>
-              <circle cx="12" cy="6.5" r="1.2" fill="#185FA5"/>
-              <circle cx="2.8" cy="2.8" r="1" fill="#185FA5"/>
-              <circle cx="10.2" cy="2.8" r="1" fill="#185FA5"/>
-              <circle cx="2.8" cy="10.2" r="1" fill="#185FA5"/>
-              <circle cx="10.2" cy="10.2" r="1" fill="#185FA5"/>
+              <circle cx="6.5" cy="1" r="1.2" fill="#185FA5"/><circle cx="6.5" cy="12" r="1.2" fill="#185FA5"/>
+              <circle cx="1" cy="6.5" r="1.2" fill="#185FA5"/><circle cx="12" cy="6.5" r="1.2" fill="#185FA5"/>
+              <circle cx="2.8" cy="2.8" r="1" fill="#185FA5"/><circle cx="10.2" cy="2.8" r="1" fill="#185FA5"/>
+              <circle cx="2.8" cy="10.2" r="1" fill="#185FA5"/><circle cx="10.2" cy="10.2" r="1" fill="#185FA5"/>
             </svg>
             ${result.weather} &middot; ${result.temp}
           </div>
         </div>
-
         <div class="section-label">What to pack</div>
-        <div class="chip-wrap">${(result.packing || []).map(p => `<span class="chip">${p}</span>`).join("")}</div>
-        ${result.outfitNote ? `<div class="outfit-note">Style note: ${result.outfitNote}</div>` : ""}
-
+        <div class="chip-wrap">${(result.packing||[]).map(p=>`<span class="chip">${p}</span>`).join("")}</div>
+        ${result.outfitNote?`<div class="outfit-note">Style note: ${result.outfitNote}</div>`:""}
         <div class="section-label">Top spots &middot; scored by local recommendation frequency</div>
-        ${(result.spots || []).map(spot => `
+        ${(result.spots||[]).map(s=>`
           <div class="spot-card">
-            <img class="spot-img"
-              src="https://source.unsplash.com/featured/700x360/?${encodeURIComponent(destination + "," + spot.imgQ)}"
-              alt="${spot.name}"
-              onerror="this.src='https://picsum.photos/seed/${encodeURIComponent(spot.name + destination)}/700/360'"
-            />
+            <img class="spot-img" src="https://source.unsplash.com/featured/700x360/?${encodeURIComponent(destination+","+s.imgQ)}" alt="${s.name}" onerror="this.src='https://picsum.photos/seed/${encodeURIComponent(s.name+destination)}/700/360'"/>
             <div class="spot-body">
               <div class="spot-header">
                 <div>
-                  ${spot.mustVisit ? `<div class="must-badge">Must visit</div>` : ""}
-                  <div class="spot-name">${spot.name}</div>
-                  <div class="spot-type">${spot.type} &middot; ${spot.tag}</div>
+                  ${s.mustVisit?`<div class="must-badge">Must visit</div>`:""}
+                  <div class="spot-name">${s.name}</div>
+                  <div class="spot-type">${s.type} &middot; ${s.tag}</div>
                 </div>
-                <div class="score-badge ${spot.mustVisit ? "must-visit" : ""}">${spot.score}/10</div>
+                <div class="score-badge ${s.mustVisit?"must-visit":""}">${s.score}/10</div>
               </div>
-              <div class="spot-desc">${spot.desc}</div>
-              ${spot.photoTip ? `<div class="photo-tip">${spot.photoTip}</div>` : ""}
+              <div class="spot-desc">${s.desc}</div>
+              ${s.photoTip?`<div class="photo-tip">${s.photoTip}</div>`:""}
             </div>
-          </div>
-        `).join("")}
-
-        ${result.contentTip ? `
-          <div class="info-box">
-            <div class="info-label">Content creator tip</div>
-            <div class="info-text">${result.contentTip}</div>
-          </div>` : ""}
-
-        ${result.eventsNote ? `
-          <div class="info-box" style="margin-top:10px">
-            <div class="info-label">Local events &amp; experiences</div>
-            <div class="info-text">${result.eventsNote}</div>
-          </div>` : ""}
-
+          </div>`).join("")}
+        ${result.contentTip?`<div class="info-box"><div class="info-label">Content creator tip</div><div class="info-text">${result.contentTip}</div></div>`:""}
+        ${result.eventsNote?`<div class="info-box" style="margin-top:10px"><div class="info-label">Local events &amp; experiences</div><div class="info-text">${result.eventsNote}</div></div>`:""}
         <div class="help-section">
           <div class="help-heading">What do you need help with today?</div>
           <div class="help-grid">
-            ${HELP_OPTIONS.map(h => `
-              <button class="help-btn" onclick="showComingSoon('${h.id}', '${h.label}', ${h.module})">
-                <div class="help-btn-label">${h.label}</div>
-                <div class="help-btn-sub">${h.sub}</div>
-              </button>
-            `).join("")}
+            ${HELP_OPTIONS.map(h=>`<button class="help-btn" onclick="showCS('${h.id}','${h.label}',${h.module})"><div class="help-btn-label">${h.label}</div><div class="help-btn-sub">${h.sub}</div></button>`).join("")}
           </div>
           <div id="comingSoon" class="coming-soon"></div>
-        </div>
-      `;
+        </div>`;
     }
 
-    function showComingSoon(id, label, module) {
-      const el = document.getElementById("comingSoon");
-      el.style.display = "block";
-      el.innerHTML = `<strong>${label}</strong> is Module ${module} of VOYA — next in the build queue as we expand this module by module.`;
+    function showCS(id,label,module) {
+      const el=document.getElementById("comingSoon");
+      el.style.display="block";
+      el.innerHTML=`<strong>${label}</strong> is Module ${module} of VOYA — next in the build queue.`;
     }
   </script>
 </body>
