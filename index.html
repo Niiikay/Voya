@@ -189,6 +189,14 @@
     .itin-type{font-size:11px;color:var(--gray-400);margin-top:3px;text-transform:uppercase;letter-spacing:.06em}
     .itin-food-badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:4px;background:var(--teal-50);color:var(--teal-800);margin-top:4px;letter-spacing:.04em}
 
+    .style-btn{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-md);padding:12px 8px;cursor:pointer;text-align:center;width:100%;transition:all .15s;font-family:var(--font-body)}
+    .style-btn:hover{border-color:var(--gray-400)}
+    .style-btn-active{border:1.5px solid var(--blue-600);background:var(--blue-50)}
+    .style-label{font-size:13px;font-weight:500;color:var(--gray-900);margin-top:6px;margin-bottom:2px}
+    .style-btn-active .style-label{color:var(--blue-800)}
+    .style-desc{font-size:11px;color:var(--gray-400);line-height:1.3}
+    .style-btn svg{color:var(--gray-400);margin:0 auto;display:block}
+    .style-btn-active svg{color:var(--blue-600)}
     @media(max-width:480px){
       .app{padding:2rem 1rem 4rem}
       .heading{font-size:30px}
@@ -281,12 +289,47 @@
       <div id="resultsView" style="display:none"></div>
     </div>
 
-    <!-- M2: Step A - Sub-interests -->
+    <!-- M2: Step A - Sub-interests + pace + style -->
     <div id="m2stepA" style="display:none">
       <div class="wordmark">VOYA</div>
       <button class="btn-ghost" onclick="backToResults()">&#8592; Back to spots</button>
       <h1 class="heading">Plan your<br>days</h1>
-      <p class="subtext">Tell us more about what you want each day to feel like — we'll build your itinerary around it.</p>
+      <p class="subtext">Tell us what each day should feel like — we'll build your itinerary around it.</p>
+
+      <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1.5rem">
+        <div style="font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-400);margin-bottom:10px">Trip pace &mdash; how many spots per day?</div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <button onclick="adjustPace(-1)" style="width:34px;height:34px;border-radius:50%;border:1px solid var(--gray-200);background:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--gray-600)">&#8722;</button>
+          <div style="text-align:center;flex:1">
+            <div id="paceNum" style="font-family:var(--font-display);font-size:36px;font-weight:400;color:var(--gray-900)">4</div>
+            <div style="font-size:12px;color:var(--gray-400)">spots per day</div>
+          </div>
+          <button onclick="adjustPace(1)" style="width:34px;height:34px;border-radius:50%;border:1px solid var(--gray-200);background:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--gray-600)">&#43;</button>
+        </div>
+        <div id="paceLabel" style="text-align:center;font-size:12px;color:var(--blue-600);margin-top:8px;font-style:italic">Balanced — a good mix of exploring and breathing room</div>
+      </div>
+
+      <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1.5rem">
+        <div style="font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-400);margin-bottom:10px">Travel style</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+          <button id="style-tourist" class="style-btn" onclick="setStyle('tourist')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <div class="style-label">Tourist</div>
+            <div class="style-desc">Iconic & essential</div>
+          </button>
+          <button id="style-local" class="style-btn" onclick="setStyle('local')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+            <div class="style-label">Local</div>
+            <div class="style-desc">Hidden & authentic</div>
+          </button>
+          <button id="style-both" class="style-btn style-btn-active" onclick="setStyle('both')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            <div class="style-label">Both</div>
+            <div class="style-desc">Best of both worlds</div>
+          </button>
+        </div>
+      </div>
+
       <div id="subInterestContainer"></div>
       <button class="btn-primary" onclick="goToM2Confirm()">Build my itinerary &rarr;</button>
     </div>
@@ -449,27 +492,44 @@ const M1_INTERESTS=[
   {id:"local",label:"Local Vibes",desc:"Events & neighborhood life"},
 ];
 
+const SVG_ICONS={
+  coffee:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>`,
+  brunch:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>`,
+  bakery:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M12 6c-2 0-4 1-4 3s2 3 4 3 4-1 4-3-2-3-4-3z"/></svg>`,
+  sunrise:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 2v2M4.93 4.93l1.41 1.41M2 12h2M19.07 4.93l-1.41 1.41M22 12h-2M12 6a6 6 0 0 1 6 6H6a6 6 0 0 1 6-6zM3 20h18M7 20v-2M17 20v-2"/></svg>`,
+  lunch:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg>`,
+  streetfood:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`,
+  museums:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/></svg>`,
+  nature_walk:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M17 8C8 10 5.9 16.17 3.82 22"/><path d="M9.1 17.4L7 22"/><path d="M12 22L9 12l5-3 3 3-2 2-3-1"/><circle cx="16" cy="5" r="2"/></svg>`,
+  shopping2:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>`,
+  beaches:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 22l10-10"/><path d="M6.36 17.64C4.13 15.41 3 12.5 3 9.5a9 9 0 0 1 9-9c3 0 5.91 1.13 8.14 3.36"/><path d="M11.5 3C13 5 14 7.5 14 10.5c0 3.5-2 6.5-5 8"/><path d="M2 22c2-2 4-3 6-3s4 1 6 3"/></svg>`,
+  dinner_fine:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M5 8h8v9a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="8" y1="3" x2="16" y2="3"/></svg>`,
+  dinner_casual:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg>`,
+  rooftop:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
+  nightlife2:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`,
+  sunset:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 10a4 4 0 0 1 4 4H8a4 4 0 0 1 4-4zM12 2v2M4.93 4.93l1.41 1.41M2 12h2M19.07 4.93l-1.41 1.41M22 12h-2M3 20h18"/></svg>`,
+};
 const SUB_INTERESTS=[
   {cat:"Morning & Brunch",items:[
-    {id:"coffee",icon:"☕",label:"Coffee shops",desc:"Third wave & local roasters"},
-    {id:"brunch",icon:"🥞",label:"Brunch spots",desc:"Weekend brunch & eggs"},
-    {id:"bakery",icon:"🥐",label:"Bakeries",desc:"Fresh pastries & bread"},
-    {id:"sunrise",icon:"🌅",label:"Sunrise spots",desc:"Golden hour photography"},
+    {id:"coffee",icon:"coffee",label:"Coffee shops",desc:"Third wave & local roasters"},
+    {id:"brunch",icon:"brunch",label:"Brunch spots",desc:"Weekend brunch & eggs"},
+    {id:"bakery",icon:"bakery",label:"Bakeries",desc:"Fresh pastries & bread"},
+    {id:"sunrise",icon:"sunrise",label:"Sunrise spots",desc:"Golden hour photography"},
   ]},
   {cat:"Afternoon",items:[
-    {id:"lunch",icon:"🍜",label:"Local lunch",desc:"Authentic midday eats"},
-    {id:"streetfood",icon:"🌮",label:"Street food",desc:"Markets & food stalls"},
-    {id:"museums",icon:"🏛️",label:"Museums & art",desc:"Culture & exhibitions"},
-    {id:"nature_walk",icon:"🌿",label:"Nature & hikes",desc:"Scenic trails & parks"},
-    {id:"shopping2",icon:"🛍️",label:"Shopping",desc:"Markets & boutiques"},
-    {id:"beaches",icon:"🏖️",label:"Beaches & water",desc:"Swim, relax & explore"},
+    {id:"lunch",icon:"lunch",label:"Local lunch",desc:"Authentic midday eats"},
+    {id:"streetfood",icon:"streetfood",label:"Street food",desc:"Markets & food stalls"},
+    {id:"museums",icon:"museums",label:"Museums & art",desc:"Culture & exhibitions"},
+    {id:"nature_walk",icon:"nature_walk",label:"Nature & hikes",desc:"Scenic trails & parks"},
+    {id:"shopping2",icon:"shopping2",label:"Shopping",desc:"Markets & boutiques"},
+    {id:"beaches",icon:"beaches",label:"Beaches & water",desc:"Swim, relax & explore"},
   ]},
   {cat:"Evening & Night",items:[
-    {id:"dinner_fine",icon:"🍷",label:"Fine dining",desc:"Upscale restaurants"},
-    {id:"dinner_casual",icon:"🍕",label:"Casual dinner",desc:"Laid-back local spots"},
-    {id:"rooftop",icon:"🌆",label:"Rooftop bars",desc:"Views & cocktails"},
-    {id:"nightlife2",icon:"🎶",label:"Nightlife",desc:"Clubs, bars & live music"},
-    {id:"sunset",icon:"🌇",label:"Sunset spots",desc:"Best views at dusk"},
+    {id:"dinner_fine",icon:"dinner_fine",label:"Fine dining",desc:"Upscale restaurants"},
+    {id:"dinner_casual",icon:"dinner_casual",label:"Casual dinner",desc:"Laid-back local spots"},
+    {id:"rooftop",icon:"rooftop",label:"Rooftop bars",desc:"Views & cocktails"},
+    {id:"nightlife2",icon:"nightlife2",label:"Nightlife",desc:"Clubs, bars & live music"},
+    {id:"sunset",icon:"sunset",label:"Sunset spots",desc:"Best views at dusk"},
   ]},
 ];
 
@@ -485,6 +545,22 @@ const HELP_OPTIONS=[
 let selInterests=[],destination="",flyingFrom="",dateFrom="",dateTo="",result=null;
 let selSubs=[],confirmedSpots=[],itinerary=null;
 let loadingInterval=null,loadingIdx=0,acTimer=null,itinInterval=null,itinIdx=0;
+let tripPace=4,travelStyle="both";
+
+function adjustPace(delta){
+  tripPace=Math.min(8,Math.max(1,tripPace+delta));
+  document.getElementById("paceNum").textContent=tripPace;
+  const labels={1:"Very light — one key experience per day",2:"Easy — leisurely exploring",3:"Relaxed — room to wander",4:"Balanced — a good mix of exploring and breathing room",5:"Active — full days, well planned",6:"Busy — hitting lots of highlights",7:"Packed — morning to night",8:"Maximum — every hour counts"};
+  document.getElementById("paceLabel").textContent=labels[tripPace]||"";
+}
+
+function setStyle(s){
+  travelStyle=s;
+  ["tourist","local","both"].forEach(id=>{
+    const el=document.getElementById("style-"+id);
+    if(el)el.className="style-btn"+(id===s?" style-btn-active":"");
+  });
+}
 
 /* ── LOGIN ── */
 function doLogin(){
@@ -525,7 +601,8 @@ function acSearch(input,listId){
     const isFrom=listId==="fromList";
     list.innerHTML=matches.map(m=>{
       const[city,...rest]=m.split(",");const country=rest.join(",").trim();
-      return`<div class="autocomplete-item" onclick="pickCity('${input.id}','${listId}',\`${m}\`)"><span style="font-size:13px">${isFrom?"✈":"📍"}</span><span>${city}</span>${country?`<span class="ac-sub">${country}</span>`:""}</div>`;
+      const ico=isFrom?`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>`:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`;
+      return`<div class="autocomplete-item" onclick="pickCity('${input.id}','${listId}',\`${m}\`)">${ico}<span>${city}</span>${country?`<span class="ac-sub">${country}</span>`:""}</div>`;
     }).join("");
     list.style.display="block";
   },160);
@@ -575,7 +652,7 @@ window.addEventListener("load",()=>{
     cat.items.forEach(item=>{
       const card=document.createElement("div");
       card.className="sub-card";card.id="sub-"+item.id;
-      card.innerHTML=`<span class="sub-icon">${item.icon}</span><div class="sub-text"><div class="sub-label">${item.label}</div><div class="sub-desc">${item.desc}</div></div>`;
+      card.innerHTML=`<span class="sub-icon" style="color:var(--blue-600)">${SVG_ICONS[item.icon]||""}</span><div class="sub-text"><div class="sub-label">${item.label}</div><div class="sub-desc">${item.desc}</div></div>`;
       card.addEventListener("click",()=>{
         selSubs.includes(item.id)?selSubs=selSubs.filter(x=>x!==item.id):selSubs.push(item.id);
         card.classList.toggle("selected",selSubs.includes(item.id));
@@ -751,19 +828,28 @@ function goToM2Confirm(){
 
 function renderConfirmList(){
   const el=document.getElementById("confirmList");
-  el.innerHTML=confirmedSpots.map((s,i)=>`
-    <div class="confirm-spot ${s.confirmed?"":"removed"}" id="cs-${i}">
-      <div class="confirm-check ${s.confirmed?"checked":""}" onclick="toggleSpot(${i})">
-        ${s.confirmed?`<svg width="12" height="12" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>`:""}
-      </div>
+  el.innerHTML=confirmedSpots.map((s,i)=>{
+    const mapsUrl=`https://www.google.com/maps/search/${encodeURIComponent(s.name+", "+destination)}`;
+    const igUrl=`https://www.instagram.com/explore/tags/${encodeURIComponent(s.name.replace(/\s+/g,"").toLowerCase()+destination.split(",")[0].replace(/\s+/g,"").toLowerCase())}`;
+    const checkSvg=`<svg width="12" height="12" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>`;
+    const mapIco=`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`;
+    const igIco=`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>`;
+    const durMap={nature:"2–3 hrs",culture:"1.5–2 hrs",food:"1–1.5 hrs",nightlife:"2–4 hrs",shopping:"1–2 hrs",adventure:"3–4 hrs",photography:"1–2 hrs",experience:"2–3 hrs"};
+    const dur=durMap[s.type]||"1–2 hrs";
+    return`<div class="confirm-spot ${s.confirmed?"":"removed"}" id="cs-${i}">
+      <div class="confirm-check ${s.confirmed?"checked":""}" onclick="toggleSpot(${i})">${s.confirmed?checkSvg:""}</div>
       <div class="confirm-spot-body">
-        <div style="margin-bottom:4px">
-          ${s.mustVisit?`<span class="confirm-badge cb-must">Must visit</span>`:`<span class="confirm-badge cb-rec">Recommended</span>`}
-        </div>
+        <div style="margin-bottom:5px">${s.mustVisit?`<span class="confirm-badge cb-must">Must visit</span>`:`<span class="confirm-badge cb-rec">Recommended</span>`}</div>
         <div class="confirm-spot-name">${s.name}</div>
         <div class="confirm-spot-meta">${s.type} &middot; ${s.neighborhood||destination} &middot; Score: ${s.score}/10</div>
+        <div style="font-size:11px;color:var(--teal-600);margin-top:3px">Approx. visit time: ${dur}</div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <a href="${mapsUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--blue-600);text-decoration:none;background:var(--blue-50);border:1px solid var(--blue-100);border-radius:20px;padding:3px 10px">${mapIco} Google Maps</a>
+          <a href="${igUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#C13584;text-decoration:none;background:#FDF3F8;border:1px solid #F4C0D1;border-radius:20px;padding:3px 10px">${igIco} Instagram</a>
+        </div>
       </div>
-    </div>`).join("");
+    </div>`;
+  }).join("");
 }
 
 function toggleSpot(i){
@@ -785,22 +871,25 @@ async function buildItinerary(){
   const numDays=Math.max(1,Math.round((new Date(dateTo)-new Date(dateFrom))/(1000*60*60*24)));
   const spotsStr=kept.map(s=>`${s.name} (${s.type}, ${s.neighborhood||"central"})`).join(", ");
   const subsStr=selSubs.length?selSubs.join(", "):"general";
+  const styleNote=travelStyle==="tourist"?"Focus on iconic, well-known tourist attractions":travelStyle==="local"?"Focus on hidden gems, local favorites, off-the-beaten-path spots":"Mix iconic tourist spots with local hidden gems equally";
 
-  const prompt=`You are a travel itinerary AI for VOYA. Build a ${numDays}-day itinerary for ${destination} with these confirmed spots: ${spotsStr}. User sub-interests: ${subsStr}.
+  const prompt=`You are a travel itinerary AI for VOYA. Build a ${numDays}-day itinerary for ${destination} with these confirmed spots: ${spotsStr}. User sub-interests: ${subsStr}. Travel style: ${styleNote}. Max spots per day: ${tripPace}.
 
 Rules:
+- NEVER exceed ${tripPace} spots per day total across all slots
 - Assign spots to morning/afternoon/evening slots logically by type
 - Breakfast/coffee/brunch spots go in morning slot
 - Lunch/street food spots go in afternoon slot  
 - Dinner/bars/nightlife go in evening slot
 - Nature/museums/shopping can go morning or afternoon
 - Spread spots across all ${numDays} days evenly
-- Add 1-2 AI-suggested filler spots per day (meals or quick stops) that were NOT in the original list, to fill gaps
-- Each spot needs a short 1-sentence visit tip
+- Add AI-suggested filler spots only if needed to reach ${tripPace} spots per day
+- Each spot needs: a short 1-sentence tip AND estimated visit duration in minutes
+- Group nearby spots on same day to minimize driving
 
 Return ONLY valid JSON no markdown:
-{"days":[{"day":1,"date":"${dateFrom}","theme":"one word vibe for the day","morning":[{"name":"Place","type":"coffee|brunch|attraction|nature|museum","tip":"short visit tip","isNew":false}],"afternoon":[{"name":"Place","type":"lunch|attraction|shopping|nature","tip":"short visit tip","isNew":false}],"evening":[{"name":"Place","type":"dinner|bar|nightlife|sunset","tip":"short visit tip","isNew":false}]}]}
-isNew=true means it was AI-suggested (not from user's confirmed list). Include all ${numDays} days.`;
+{"days":[{"day":1,"date":"${dateFrom}","theme":"one word vibe for the day","morning":[{"name":"Place","type":"coffee|brunch|attraction|nature|museum","tip":"short visit tip","duration":90,"isNew":false}],"afternoon":[{"name":"Place","type":"lunch|attraction|shopping|nature","tip":"short visit tip","duration":60,"isNew":false}],"evening":[{"name":"Place","type":"dinner|bar|nightlife|sunset","tip":"short visit tip","duration":120,"isNew":false}]}]}
+isNew=true means AI-suggested. duration is minutes. Include all ${numDays} days.`;
 
   try{
     const r=await fetch("https://api.groq.com/openai/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":`Bearer ${getKey()}`},body:JSON.stringify({model:"llama-3.3-70b-versatile",messages:[{role:"user",content:prompt}],temperature:.7,max_tokens:2000})});
@@ -824,9 +913,12 @@ function renderItinerary(){
   document.getElementById("itinLoadingView").style.display="none";
   const rv=document.getElementById("itinResultView");rv.style.display="block";
 
-  // Build Google Maps search URL for all confirmed spots
-  const spotNames=confirmedSpots.filter(s=>s.confirmed).map(s=>encodeURIComponent(s.name+", "+destination));
-  const mapQuery=encodeURIComponent(confirmedSpots.filter(s=>s.confirmed).map(s=>s.name).join(" | ")+" "+destination);
+  // Build proper Google Maps directions URL with all waypoints
+  const keptSpots=confirmedSpots.filter(s=>s.confirmed);
+  const origin=encodeURIComponent(keptSpots[0].name+", "+destination);
+  const dest_end=encodeURIComponent(keptSpots[keptSpots.length-1].name+", "+destination);
+  const waypoints=keptSpots.slice(1,-1).map(s=>encodeURIComponent(s.name+", "+destination)).join("|");
+  const mapsDirectionsUrl=`https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${dest_end}${waypoints?`&waypoints=${waypoints}`:""}&travelmode=driving&optimize=true`;
   const mapSrc=`https://maps.google.com/maps?q=${encodeURIComponent(destination)}&output=embed&z=13`;
 
   let counter=1;
@@ -839,12 +931,23 @@ function renderItinerary(){
         <div class="slot-label"><div class="slot-dot ${dotClass}"></div>${slotName}</div>
         ${items.map(item=>{
           const n=counter++;
+          const durText=item.duration?`${item.duration>=60?Math.floor(item.duration/60)+"h"+(item.duration%60?""+item.duration%60+"m":""):`${item.duration}m`}`:"";
+          const mapsLink=`https://www.google.com/maps/search/${encodeURIComponent(item.name+", "+destination)}`;
+          const igLink=`https://www.instagram.com/explore/tags/${encodeURIComponent(item.name.replace(/\s+/g,"").toLowerCase())}`;
+          const mapIco=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>`;
+          const igIco=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>`;
           return`<div class="itin-item">
             <div class="itin-num">${n}</div>
             <div class="itin-body">
-              <div class="itin-name">${item.name}${item.isNew?` <span style="font-size:10px;color:var(--blue-600);font-weight:500">+ AI pick</span>`:""}</div>
+              <div class="itin-name">${item.name}${item.isNew?` <span style="font-size:10px;color:var(--blue-600);font-weight:500">AI pick</span>`:""}</div>
               <div class="itin-tip">${item.tip}</div>
-              <div class="itin-type">${item.type}</div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
+                <div style="display:flex;gap:6px">
+                  <a href="${mapsLink}" target="_blank" style="display:inline-flex;align-items:center;gap:3px;font-size:10px;color:var(--blue-600);text-decoration:none;background:var(--blue-50);border:1px solid var(--blue-100);border-radius:20px;padding:2px 8px">${mapIco} Maps</a>
+                  <a href="${igLink}" target="_blank" style="display:inline-flex;align-items:center;gap:3px;font-size:10px;color:#C13584;text-decoration:none;background:#FDF3F8;border:1px solid #F4C0D1;border-radius:20px;padding:2px 8px">${igIco} Instagram</a>
+                </div>
+                ${durText?`<span style="font-size:10px;color:var(--gray-400)">${durText}</span>`:""}
+              </div>
             </div>
           </div>`;
         }).join("")}
@@ -868,7 +971,10 @@ function renderItinerary(){
     <div class="map-wrap">
       <iframe src="${mapSrc}" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
     </div>
-    <a href="https://www.google.com/maps/search/${mapQuery}" target="_blank" style="display:block;text-align:center;font-size:13px;color:var(--blue-600);margin-bottom:2rem;text-decoration:none">Open full map with all spots &rarr;</a>
+    <a href="${mapsDirectionsUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--blue-600);margin-bottom:2rem;text-decoration:none;background:var(--blue-50);border:1px solid var(--blue-100);border-radius:var(--radius-sm);padding:8px 16px">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      Open optimized route in Google Maps &rarr;
+    </a>
 
     <div class="section-label">Your day-by-day plan</div>
     ${daysHtml}
@@ -884,6 +990,9 @@ function renderItinerary(){
 
 function restart(){
   flyingFrom="";destination="";dateFrom="";dateTo="";selInterests=[];result=null;selSubs=[];confirmedSpots=[];itinerary=null;
+  tripPace=4;travelStyle="both";
+  if(document.getElementById("paceNum"))document.getElementById("paceNum").textContent="4";
+  ["tourist","local","both"].forEach(id=>{const el=document.getElementById("style-"+id);if(el)el.className="style-btn"+(id==="both"?" style-btn-active":"");});
   ["step2","m2stepA","m2stepB","m2stepC"].forEach(id=>document.getElementById(id).style.display="none");
   document.getElementById("step0").style.display="block";
   ["flyingFrom","dest","dateFrom","dateTo"].forEach(id=>document.getElementById(id).value="");
