@@ -748,6 +748,7 @@ Include 6 spots scored 1-10 (8+ is must-go). Be specific and local.`;
     result=JSON.parse(d.choices[0].message.content.replace(/```json|```/g,"").trim());
     clearInterval(loadingInterval);renderResults();
     setTimeout(()=>loadSpotPhotos(result.spots||[]),400);
+    setTimeout(()=>loadEvents(),600);
   }catch(err){
     clearInterval(loadingInterval);
     let msg = err.message;
@@ -764,6 +765,71 @@ Include 6 spots scored 1-10 (8+ is must-go). Be specific and local.`;
 }
 
 function formatDate(d){return new Date(d+"T00:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});}
+
+async function loadEvents(){
+  const evEl=document.getElementById("eventsSection");
+  if(!evEl)return;
+  evEl.innerHTML=`<div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:1.25rem"><div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gray-400);margin-bottom:6px">Local events &amp; experiences</div><div class="spinner" style="width:20px;height:20px;margin:1rem auto"></div></div>`;
+
+  const destCity=destination.split(",")[0].trim();
+  const prompt=`You are an events AI for VOYA travel app. The user is visiting ${destination} from ${dateFrom} to ${dateTo}.
+
+Find real, specific events, festivals, concerts, markets, sports games, exhibitions or local experiences that are likely happening in ${destCity} during those dates. Focus on ticketed or bookable events.
+
+Return ONLY valid JSON no markdown:
+{"events":[{"name":"Event name","date":"date or date range like Apr 13-15","venue":"venue name","type":"concert|festival|sports|market|exhibition|experience|food","desc":"one sentence what it is","ticketUrl":"https://... (use stubhub.com, eventbrite.com, ticketmaster.com, or venue website — pick the most likely real URL for this event)","price":"price range like $20-80 or Free"}]}
+
+Include 4-6 events. If you are not certain of a specific event, suggest the type of event that typically happens in ${destCity} in that season and link to eventbrite.com/d/${encodeURIComponent(destCity).toLowerCase()}/ or stubhub.com for discovery. Be helpful and specific.`;
+
+  try{
+    const r=await fetch("https://api.groq.com/openai/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":`Bearer ${getKey()}`},body:JSON.stringify({model:"llama-3.3-70b-versatile",messages:[{role:"user",content:prompt}],temperature:.7,max_tokens:800})});
+    const d=await r.json();
+    if(d.error)throw new Error(d.error.message);
+    const events=JSON.parse(d.choices[0].message.content.replace(/```json|```/g,"").trim());
+    renderEvents(events.events||[]);
+  }catch(e){
+    evEl.innerHTML="";// silently fail — events is a bonus feature
+  }
+}
+
+function renderEvents(events){
+  const evEl=document.getElementById("eventsSection");
+  if(!evEl||!events.length){if(evEl)evEl.innerHTML="";return;}
+  const typeColors={
+    concert:"background:#EDE9FE;color:#5B21B6;border-color:#C4B5FD",
+    festival:"background:#FEF3C7;color:#92400E;border-color:#FCD34D",
+    sports:"background:#DBEAFE;color:#1E40AF;border-color:#93C5FD",
+    market:"background:#D1FAE5;color:#065F46;border-color:#6EE7B7",
+    exhibition:"background:#FCE7F3;color:#9D174D;border-color:#F9A8D4",
+    experience:"background:#E0F2FE;color:#0C4A6E;border-color:#7DD3FC",
+    food:"background:#FEF9C3;color:#713F12;border-color:#FDE047",
+  };
+  const extIco=`<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
+  evEl.innerHTML=`
+    <div style="margin-bottom:.75rem">
+      <div class="section-label" style="margin:0 0 4px">Events &amp; experiences during your stay</div>
+      <div style="font-size:12px;color:var(--gray-400)">Happening in ${destination.split(",")[0]} · ${formatDate(dateFrom)} &ndash; ${formatDate(dateTo)}</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:1.25rem">
+      ${events.map(ev=>{
+        const tc=typeColors[ev.type]||typeColors.experience;
+        return`<div style="background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-md);padding:1rem">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px">
+            <div style="flex:1">
+              <span style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;${tc};border:1px solid;border-radius:4px;padding:2px 7px;display:inline-block;margin-bottom:5px">${ev.type}</span>
+              <div style="font-size:15px;font-weight:500;color:var(--gray-900)">${ev.name}</div>
+            </div>
+            ${ev.price?`<div style="font-size:12px;font-weight:500;color:var(--teal-600);white-space:nowrap">${ev.price}</div>`:""}
+          </div>
+          <div style="font-size:12px;color:var(--gray-400);margin-bottom:4px">${ev.date}${ev.venue?" &middot; "+ev.venue:""}</div>
+          <div style="font-size:13px;color:var(--gray-600);margin-bottom:10px;line-height:1.5">${ev.desc}</div>
+          <a href="${ev.ticketUrl}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:var(--blue-600);text-decoration:none;background:var(--blue-50);border:1px solid var(--blue-100);border-radius:var(--radius-sm);padding:6px 12px">
+            ${extIco} Find tickets &amp; info
+          </a>
+        </div>`;
+      }).join("")}
+    </div>`;
+}
 
 async function loadSpotPhotos(spots){
   const PEXELS_KEY=localStorage.getItem("voya_pexels_key")||"";
@@ -850,6 +916,7 @@ function renderResults(){
       </div>`).join("")}
     ${result.contentTip?`<div class="info-box"><div class="info-label">Content creator tip</div><div class="info-text">${result.contentTip}</div></div>`:""}
     ${result.eventsNote?`<div class="info-box" style="margin-top:10px"><div class="info-label">Local events &amp; experiences</div><div class="info-text">${result.eventsNote}</div></div>`:""}
+    <div id="eventsSection" style="margin-top:10px"></div>
     <div class="itin-banner">
       <div class="itin-banner-text">
         <div class="itin-banner-title">Ready to plan your days?</div>
@@ -952,20 +1019,34 @@ Return ONLY valid JSON no markdown:
 isNew=true means AI-suggested. duration is minutes. driveFromPrev is driving minutes from previous stop (0 for first of day). Include all ${numDays} days.`;
 
   try{
-    const r=await fetch("https://api.groq.com/openai/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":`Bearer ${getKey()}`},body:JSON.stringify({model:"llama-3.3-70b-versatile",messages:[{role:"user",content:prompt}],temperature:.7,max_tokens:2000})});
+    const r=await fetch("https://api.groq.com/openai/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":`Bearer ${getKey()}`},body:JSON.stringify({model:"llama-3.3-70b-versatile",messages:[{role:"user",content:prompt}],temperature:.7,max_tokens:4000})});
     const d=await r.json();if(d.error)throw new Error(d.error.message);
-    itinerary=JSON.parse(d.choices[0].message.content.replace(/```json|```/g,"").trim());
+    const rawText=d.choices[0].message.content.replace(/```json|```/g,"").trim();
+    try{
+      itinerary=JSON.parse(rawText);
+    }catch(pe){
+      // Response may have been truncated — try to salvage complete days
+      const lastClose=rawText.lastIndexOf("}]}");
+      if(lastClose>0){
+        try{itinerary=JSON.parse(rawText.slice(0,lastClose+3));}
+        catch(e2){throw new Error("AI response was cut off. Try reducing spots per day.");}
+      }else{
+        throw new Error("AI response was cut off. Try reducing spots per day.");
+      }
+    }
     clearInterval(itinInterval);renderItinerary();
   }catch(err){
     clearInterval(itinInterval);
-    let msg2 = err.message;
-    if(msg2.includes("Failed to fetch") || msg2.includes("NetworkError")){
-      msg2 = "Could not reach the AI. Check your internet connection and try again.";
-    } else if(msg2.includes("401") || msg2.includes("auth")){
-      msg2 = "API key invalid — click Change API key at the top and re-enter it.";
+    let msg2=err.message||"Something went wrong";
+    if(msg2.includes("Failed to fetch")||msg2.includes("NetworkError")){
+      msg2="Could not reach the AI — check your internet connection.";
+    }else if(msg2.includes("401")||msg2.includes("auth")){
+      msg2="API key invalid — click Change API key and re-enter it.";
       localStorage.removeItem("voya_key");
+    }else if(msg2.includes("429")){
+      msg2="Rate limit hit — wait 30 seconds and try again.";
     }
-    document.getElementById("itinLoadingView").innerHTML=`<div class="error-msg"><p>${msg2}</p><br><button class="btn-ghost" onclick="document.getElementById(\'m2stepB\').style.display=\'block\';document.getElementById(\'m2stepC\').style.display=\'none\'" style="margin:0 auto">&#8592; Try again</button></div>`;
+    document.getElementById("itinLoadingView").innerHTML=`<div class="error-msg" style="padding:2rem 1rem"><p style="margin-bottom:16px">${msg2}</p><button class="btn-primary" style="max-width:200px;margin:0 auto 10px;display:block" onclick="buildItinerary()">Try again</button><button class="btn-ghost" style="margin:0 auto;display:flex" onclick="document.getElementById('m2stepB').style.display='block';document.getElementById('m2stepC').style.display='none'">&#8592; Back to spots</button></div>`;
   }
 }
 
