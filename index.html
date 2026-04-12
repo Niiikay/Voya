@@ -67,6 +67,16 @@
     .dot-active{width:18px;height:5px;border-radius:3px;background:var(--blue-600)}
     .heading{font-family:var(--font-display);font-size:32px;font-weight:400;line-height:1.2;color:var(--gray-900);margin-bottom:8px;white-space:nowrap}
     .subtext{font-size:15px;color:var(--gray-600);line-height:1.65;margin-bottom:2rem}
+    .recent-trips{margin-bottom:2rem}
+    .recent-label{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--gray-400);margin-bottom:.75rem}
+    .recent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+    .recent-card{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+    .recent-card:hover{border-color:var(--blue-100);box-shadow:0 4px 16px rgba(24,95,165,.08)}
+    .recent-card-img{width:100%;height:90px;object-fit:cover;background:var(--blue-50);display:block}
+    .recent-card-body{padding:.75rem}
+    .recent-card-dest{font-family:var(--font-display);font-size:16px;font-weight:400;color:var(--gray-900);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .recent-card-meta{font-size:11px;color:var(--gray-400)}
+    .recent-card-from{font-size:11px;color:var(--gray-400);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .section-label{font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--gray-400);margin:1.5rem 0 .75rem}
 
     /* FORM */
@@ -340,6 +350,7 @@
     <div id="step0">
       <div class="wordmark"><div style="display:flex;align-items:center;gap:8px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue-600)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg><span>VOYA</span></div><button class="settings-btn" onclick="document.getElementById('apiModal').classList.remove('hidden')">Change API key</button></div>
       <div class="dots"><div class="dot-active"></div><div class="dot"></div><div class="dot"></div></div>
+      <div id="recentTripsSection" class="recent-trips" style="display:none"></div>
       <h1 class="heading">Where are you headed?</h1>
       <p class="subtext">AI-powered travel intelligence for every kind of explorer.</p>
       <div class="field">
@@ -716,6 +727,7 @@ function enterApp(name, pic, method){
   if(!getKey()) document.getElementById("apiModal").classList.remove("hidden");
   // Restore last search if returning user
   setTimeout(restoreLastSearch, 100);
+  setTimeout(renderRecentTrips, 150);
 }
 
 function doLogin(){
@@ -1720,9 +1732,97 @@ function dndEnd(e){
 function saveLastSearch(){
   if(!destination)return;
   try{
-    const search={flyingFrom,destination,dateFrom,dateTo,selInterests};
+    const search={flyingFrom,destination,dateFrom,dateTo,selInterests,savedAt:Date.now()};
+    // Save to history (up to 4 recent trips)
+    let history=[];
+    try{history=JSON.parse(localStorage.getItem("voya_history")||"[]");}catch(e){}
+    // Remove duplicate destination if exists
+    history=history.filter(function(h){return h.destination!==destination;});
+    history.unshift(search);
+    history=history.slice(0,4);
+    localStorage.setItem("voya_history",JSON.stringify(history));
     localStorage.setItem("voya_last_search",JSON.stringify(search));
   }catch(e){}
+}
+
+function renderRecentTrips(){
+  const section=document.getElementById("recentTripsSection");
+  if(!section)return;
+  let history=[];
+  try{history=JSON.parse(localStorage.getItem("voya_history")||"[]");}catch(e){}
+  if(!history.length){section.style.display="none";return;}
+  section.style.display="block";
+  section.innerHTML="";
+
+  const label=document.createElement("div");
+  label.className="recent-label";
+  label.textContent="Continue your search";
+  section.appendChild(label);
+
+  const grid=document.createElement("div");
+  grid.className="recent-grid";
+  section.appendChild(grid);
+
+  const destCity=function(d){return d?d.split(",")[0].trim():"";};
+  const fmtDate=function(d){
+    if(!d)return"";
+    try{return new Date(d+"T00:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"});}catch(e){return d;}
+  };
+
+  history.forEach(function(h){
+    const city=destCity(h.destination);
+    const card=document.createElement("div");
+    card.className="recent-card";
+    card.onclick=function(){loadRecentTrip(h);};
+
+    const img=document.createElement("img");
+    img.className="recent-card-img";
+    img.src="https://source.unsplash.com/featured/400x180/?"+encodeURIComponent(city+",travel");
+    img.alt=city;
+    card.appendChild(img);
+
+    const body=document.createElement("div");
+    body.className="recent-card-body";
+
+    const dest=document.createElement("div");
+    dest.className="recent-card-dest";
+    dest.textContent=city;
+    body.appendChild(dest);
+
+    if(h.dateFrom&&h.dateTo){
+      const meta=document.createElement("div");
+      meta.className="recent-card-meta";
+      meta.textContent=fmtDate(h.dateFrom)+" – "+fmtDate(h.dateTo);
+      body.appendChild(meta);
+    }
+    if(h.flyingFrom){
+      const from=document.createElement("div");
+      from.className="recent-card-from";
+      from.textContent="from "+destCity(h.flyingFrom);
+      body.appendChild(from);
+    }
+    card.appendChild(body);
+    grid.appendChild(card);
+  });
+}
+
+function loadRecentTrip(h){
+  try{
+    if(h.flyingFrom)document.getElementById("flyingFrom").value=h.flyingFrom;
+    if(h.destination)document.getElementById("dest").value=h.destination;
+    if(h.dateFrom)document.getElementById("dateFrom").value=h.dateFrom;
+    if(h.dateTo)document.getElementById("dateTo").value=h.dateTo;
+    if(h.selInterests&&h.selInterests.length){
+      selInterests=h.selInterests;
+      selInterests.forEach(function(id){
+        const card=document.getElementById("card-"+id);
+        if(card)card.classList.add("selected");
+      });
+    }
+    validateStep0();
+    // Scroll to form
+    document.getElementById("flyingFrom").focus();
+  }catch(e){console.error(e);}
 }
 
 function restoreLastSearch(){
@@ -1759,8 +1859,8 @@ function restart(){
   M1_INTERESTS.forEach(function(i){document.getElementById("card-"+i.id)?.classList.remove("selected");});
   SUB_INTERESTS.forEach(function(cat){cat.items.forEach(function(item){document.getElementById("sub-"+item.id)?.classList.remove("selected");});});
   selInterests=[];selSubs=[];
-  // Restore last search so user doesn't start from scratch
-  setTimeout(restoreLastSearch, 50);
+  // Restore last search and show recent trips
+  setTimeout(function(){restoreLastSearch();renderRecentTrips();},50);
 }
 </script>
 </body>
