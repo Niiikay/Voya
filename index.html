@@ -663,6 +663,10 @@ function handleGoogleSignIn(response){
 function enterApp(name, pic, method){
   document.getElementById("loginScreen").classList.remove("active");
   document.getElementById("appScreen").classList.add("active");
+  // Pre-set Pexels key
+  if(!localStorage.getItem("voya_pexels_key")){
+    localStorage.setItem("voya_pexels_key","beCjJsA7wLoBjidL3f3QrhyAZl7xDDMpwvH66ki70Kf1d13znpIUG2sk");
+  }
   track("login", {method: method});
   // Update wordmark to show user
   const wm=document.querySelector(".wordmark");
