@@ -22,6 +22,8 @@
   </script>
   <!-- Google Sign-In — replace 622034097373-frmmi1ut22kptfuk9fjdri28l83mnqd8.apps.googleusercontent.com with your OAuth Client ID -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <!-- Google Places API for smart spot search -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA6_nahXbadRYOCzYYlDMUBd8xmv6ArodY&libraries=places" async defer onload="initPlacesAutocomplete()"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <style>
@@ -417,10 +419,10 @@
         <div style="font-size:12px;color:var(--gray-400);margin-bottom:10px">Know a place you want to visit that's not listed? Add it here.</div>
         <div style="position:relative">
           <div style="display:flex;gap:8px;align-items:center">
-            <input type="text" id="customSpotInput" placeholder="e.g. Universal Studios, Los Angeles" autocomplete="off" oninput="customSpotSearch()" onkeydown="customSpotKeydown(event)" style="flex:1;font-size:14px;padding:9px 12px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);background:var(--gray-50);outline:none"/>
+            <input type="text" id="customSpotInput" placeholder="e.g. Sea World, San Diego" autocomplete="off" style="flex:1;font-size:14px;padding:9px 12px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);background:var(--gray-50);outline:none"/>
             <button onclick="addCustomSpot()" style="padding:9px 16px;background:var(--blue-600);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap">Add</button>
           </div>
-          <div id="customSpotDropdown" style="display:none;position:absolute;top:100%;left:0;right:60px;background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-sm);box-shadow:0 4px 12px rgba(0,0,0,.08);z-index:50;margin-top:2px;max-height:200px;overflow-y:auto"></div>
+          <div style="font-size:11px;color:var(--gray-400);margin-top:4px">Start typing — full place name with city will appear automatically</div>
         </div>
         <div id="customSpotsList" style="margin-top:10px"></div>
       </div>
@@ -1164,6 +1166,7 @@ function goToM2Confirm(){
   // Build confirm list from M1 spots
   document.getElementById("m2stepA").style.display="none";
   document.getElementById("m2stepB").style.display="block";
+  setTimeout(ensurePlacesAutocomplete, 300);
   confirmedSpots=(result.spots||[]).map((s,i)=>({...s,confirmed:true,idx:i}));
   renderConfirmList();
 }
@@ -1203,73 +1206,50 @@ function toggleSpot(i){
 /* ── BUILD ITINERARY ── */
 let customSpots=[];
 
-let customDropdownIdx=-1;
-let customSpotTimer=null;
+let placesAutocomplete=null;
+let selectedPlaceDetails=null;
 
-function customSpotSearch(){
-  clearTimeout(customSpotTimer);
+function initPlacesAutocomplete(){
   const input=document.getElementById("customSpotInput");
-  const val=input.value.trim();
-  const dd=document.getElementById("customSpotDropdown");
-  customDropdownIdx=-1;
-  if(val.length<2){dd.style.display="none";return;}
-  customSpotTimer=setTimeout(async function(){
-    // Generate suggestions using AI
-    const destCity=destination.split(",")[0];
-    const suggestions=generateSpotSuggestions(val, destCity);
-    if(!suggestions.length){dd.style.display="none";return;}
-    dd.innerHTML=suggestions.map(function(s,i){
-      const dv=s.replace(/"/g,"&quot;");
-      return '<div class="custom-ac-item" data-val="'+dv+'" onclick="pickCustomSpot(this.dataset.val)" style="padding:9px 14px;font-size:14px;color:var(--gray-900);cursor:pointer;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:8px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> '+s+'</div>';
-    }).join("");
-    dd.style.display="block";
-  }, 200);
+  if(!input||!window.google||!google.maps||!google.maps.places)return;
+  placesAutocomplete=new google.maps.places.Autocomplete(input,{
+    types:["establishment","geocode"],
+    fields:["name","formatted_address","geometry","types","url"]
+  });
+  placesAutocomplete.addListener("place_changed",function(){
+    const place=placesAutocomplete.getPlace();
+    if(!place||!place.name)return;
+    selectedPlaceDetails=place;
+    // Show full name + address in input
+    if(place.formatted_address){
+      input.value=place.name+", "+place.formatted_address;
+    }
+  });
 }
 
-function generateSpotSuggestions(query, destCity){
-  // Disambiguate with destination city to avoid wrong location
-  const q=query.toLowerCase();
-  const suggestions=[];
-  // Always suggest with destination city appended for disambiguation
-  suggestions.push(query+", "+destCity);
-  // If user typed a city already, don't add destination
-  if(!query.includes(","))suggestions.push(query+", "+destination);
-  return suggestions.slice(0,5);
+// Retry init after confirm screen appears (DOM loaded later)
+function ensurePlacesAutocomplete(){
+  if(!placesAutocomplete){initPlacesAutocomplete();}
 }
-
-function pickCustomSpot(val){
-  document.getElementById("customSpotInput").value=val;
-  document.getElementById("customSpotDropdown").style.display="none";
-  customDropdownIdx=-1;
-}
-
-function customSpotKeydown(e){
-  const dd=document.getElementById("customSpotDropdown");
-  const items=dd.querySelectorAll(".custom-ac-item");
-  if(dd.style.display==="none"||!items.length)return;
-  if(e.key==="ArrowDown"){e.preventDefault();customDropdownIdx=Math.min(customDropdownIdx+1,items.length-1);highlightCustom(items);}
-  else if(e.key==="ArrowUp"){e.preventDefault();customDropdownIdx=Math.max(customDropdownIdx-1,0);highlightCustom(items);}
-  else if(e.key==="Enter"&&customDropdownIdx>=0){e.preventDefault();pickCustomSpot(items[customDropdownIdx].dataset.val);}
-  else if(e.key==="Escape"){dd.style.display="none";}
-}
-
-function highlightCustom(items){
-  items.forEach(function(el,i){el.style.background=i===customDropdownIdx?"var(--blue-50)":"";});
-  if(items[customDropdownIdx])items[customDropdownIdx].scrollIntoView({block:"nearest"});
-}
-
-document.addEventListener("click",function(e){
-  const dd=document.getElementById("customSpotDropdown");
-  const input=document.getElementById("customSpotInput");
-  if(dd&&input&&!dd.contains(e.target)&&e.target!==input)dd.style.display="none";
-});
 
 function addCustomSpot(){
   const input=document.getElementById("customSpotInput");
   const val=input.value.trim();
   if(!val)return;
-  document.getElementById("customSpotDropdown").style.display="none";
-  const spot={name:val,type:"experience",tag:"custom",desc:"Added by you",score:8,mustVisit:false,confirmed:true,neighborhood:val.includes(",")? val.split(",").slice(-1)[0].trim() : destination.split(",")[0],isCustom:true};
+  let name=val;
+  let neighborhood=destination.split(",")[0];
+  let mapsUrl=null;
+  // Use Places data if available
+  if(selectedPlaceDetails&&selectedPlaceDetails.name){
+    name=selectedPlaceDetails.name;
+    if(selectedPlaceDetails.formatted_address){
+      name=selectedPlaceDetails.name+" — "+selectedPlaceDetails.formatted_address.split(",").slice(0,2).join(",").trim();
+      neighborhood=selectedPlaceDetails.formatted_address.split(",")[1]?.trim()||neighborhood;
+    }
+    if(selectedPlaceDetails.url)mapsUrl=selectedPlaceDetails.url;
+    selectedPlaceDetails=null;
+  }
+  const spot={name:name,type:"experience",tag:"custom",desc:"Added by you",score:8,mustVisit:false,confirmed:true,neighborhood:neighborhood,isCustom:true,mapsUrl:mapsUrl};
   customSpots.push(spot);
   input.value="";
   renderCustomSpots();
@@ -1286,8 +1266,9 @@ function renderCustomSpots(){
   const mapIco='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
   const igIco='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>';
   el.innerHTML=customSpots.map(function(s,i){
-    const mapsLink="https://www.google.com/maps/search/"+encodeURIComponent(s.name+", "+destination);
-    const igLink="https://www.instagram.com/explore/tags/"+encodeURIComponent(s.name.replace(/[\s'&]/g,"").toLowerCase()+destination.split(",")[0].replace(/\s/g,"").toLowerCase())+"/";
+    const mapsLink=s.mapsUrl||("https://www.google.com/maps/search/"+encodeURIComponent(s.name+", "+destination));
+    const spotNameClean=s.name.split("—")[0].trim();
+    const igLink="https://www.instagram.com/explore/tags/"+encodeURIComponent(spotNameClean.replace(/[\s'&]/g,"").toLowerCase()+destination.split(",")[0].replace(/\s/g,"").toLowerCase())+"/";
     return '<div style="background:var(--teal-50);border:1px solid var(--teal-100);border-radius:var(--radius-md);padding:.7rem .9rem;margin-bottom:6px;display:flex;align-items:flex-start;gap:10px">'
       +'<div style="flex:1">'
       +'<div style="font-size:14px;font-weight:500;color:var(--teal-800);margin-bottom:4px">'+s.name+'</div>'
