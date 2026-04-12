@@ -658,7 +658,7 @@ const SUB_INTERESTS=[
 ];
 
 const LOADING_MSGS=["Scanning local posts & reels...","Reading weather patterns...","Scoring must-visit spots...","Curating your travel intel..."];
-const ITIN_MSGS=["Optimizing your route...","Sorting morning to evening...","Finding the best flow...","Almost done..."];
+const ITIN_MSGS=["Optimizing your route...","Planning your mornings...","Sorting afternoon stops...","Building your evenings...","Almost ready...","Putting it all together..."];
 const HELP_OPTIONS=[
   {id:"hotels",label:"Hotels & stays",sub:"Filter & compare",module:4},
   {id:"experiences",label:"Experiences",sub:"Local events & tickets",module:5},
@@ -1348,27 +1348,67 @@ Rules:
 - Add realistic ~15-30 min driving buffer between spots in same day
 - Group nearby spots on the same day to minimize driving
 - Spread spots across all ${numDays} days as evenly as possible
-- Each spot needs: a short 1-sentence tip, estimated visit duration in minutes, and approx drive time from previous spot in minutes (driveFromPrev, 0 for first spot of day)
+- Each spot needs: a tip (max 8 words), duration in minutes, driveFromPrev in minutes (0 for first of day)
 
 Return ONLY valid JSON no markdown:
 {"days":[{"day":1,"date":"${dateFrom}","theme":"one word vibe for the day","tempHigh":"78F","tempLow":"62F","morning":[{"name":"Place","type":"coffee|brunch|attraction|nature|museum","tip":"short visit tip","duration":90,"driveFromPrev":0,"isNew":false}],"afternoon":[{"name":"Place","type":"lunch|attraction|shopping|nature","tip":"short visit tip","duration":60,"driveFromPrev":15,"isNew":false}],"evening":[{"name":"Place","type":"dinner|bar|nightlife|sunset","tip":"short visit tip","duration":120,"driveFromPrev":20,"isNew":false}]}]}
 isNew=true means AI-suggested. duration is minutes. driveFromPrev is driving minutes from previous stop (0 for first of day). Include all ${numDays} days.`;
 
   try{
-    const r=await fetch("https://api.groq.com/openai/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":`Bearer ${getKey()}`},body:JSON.stringify({model:"llama-3.3-70b-versatile",messages:[{role:"user",content:prompt}],temperature:.7,max_tokens:4000})});
-    const d=await r.json();if(d.error)throw new Error(d.error.message);
-    const rawText=d.choices[0].message.content.replace(/```json|```/g,"").trim();
-    try{
-      itinerary=JSON.parse(rawText);
-    }catch(pe){
-      const lastClose=rawText.lastIndexOf("}]}");
-      if(lastClose>0){
-        try{itinerary=JSON.parse(rawText.slice(0,lastClose+3));}
-        catch(e2){throw new Error("AI response was cut off. Try reducing spots per day.");}
-      }else{
-        throw new Error("AI response was cut off. Try reducing spots per day.");
+    // For long trips split into batches to avoid token limits
+    const batchSize=numDays<=3?numDays:2;
+    const allDays=[];
+    let dayOffset=0;
+    const startDate=new Date(dateFrom+"T00:00:00");
+
+    while(dayOffset<numDays){
+      const batchDays=Math.min(batchSize,numDays-dayOffset);
+      const batchStartDate=new Date(startDate);
+      batchStartDate.setDate(startDate.getDate()+dayOffset);
+      const batchDateStr=batchStartDate.toISOString().split("T")[0];
+
+      const batchPrompt=prompt.replace(
+        `Include all \${numDays} days.`,
+        `Generate ONLY days \${dayOffset+1} through \${dayOffset+batchDays} (starting from date \${batchDateStr}). Output \${batchDays} day(s) only.`
+      );
+
+      const r=await fetch("https://api.groq.com/openai/v1/chat/completions",{
+        method:"POST",
+        headers:{"Content-Type":"application/json","Authorization":`Bearer ${getKey()}`},
+        body:JSON.stringify({model:"llama-3.3-70b-versatile",messages:[{role:"user",content:batchPrompt}],temperature:.7,max_tokens:3000})
+      });
+      const d=await r.json();
+      if(d.error)throw new Error(d.error.message);
+      let rawText=d.choices[0].message.content.replace(/```json|```/g,"").trim();
+
+      let batchResult;
+      try{
+        batchResult=JSON.parse(rawText);
+      }catch(pe){
+        const lastClose=rawText.lastIndexOf("}]}");
+        if(lastClose>0){
+          try{batchResult=JSON.parse(rawText.slice(0,lastClose+3));}
+          catch(e2){
+            if(allDays.length>0)break; // Use what we have
+            throw new Error("AI response was cut off. Try fewer spots per day (try 2-3).");
+          }
+        }else{
+          if(allDays.length>0)break;
+          throw new Error("AI response was cut off. Try fewer spots per day (try 2-3).");
+        }
       }
+      if(batchResult&&batchResult.days){
+        // Fix day numbers to be sequential
+        batchResult.days.forEach(function(day,i){
+          day.day=dayOffset+i+1;
+          allDays.push(day);
+        });
+      }
+      dayOffset+=batchDays;
+      // Small delay between batch calls
+      if(dayOffset<numDays)await new Promise(function(r){setTimeout(r,300);});
     }
+    itinerary={days:allDays};
     // Post-process: remove duplicates and excluded spots client-side
     itinerary=deduplicateItinerary(itinerary, includedNames, excludedStr);
     clearInterval(itinInterval);renderItinerary();
