@@ -236,9 +236,7 @@
     .style-btn-active .style-label{color:var(--blue-800)}
     .style-desc{font-size:11px;color:var(--gray-400);line-height:1.3}
     .style-btn svg{color:var(--gray-400);margin:0 auto;display:block}
-    .itin-item{cursor:grab;transition:border-color .15s,opacity .15s;position:relative;touch-action:none}
-    .itin-item:active{cursor:grabbing}
-    .dnd-placeholder{pointer-events:none}
+    .itin-item{position:relative}
     .share-btn{display:flex;align-items:center;gap:10px;padding:14px 16px;background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-lg);text-decoration:none;transition:border-color .15s}
     .share-wa:hover{border-color:#25D366}
     .share-email:hover{border-color:var(--blue-600)}
@@ -247,7 +245,7 @@
     .share-ico-email{background:var(--blue-50);border:1px solid var(--blue-100)}
     .share-label{font-size:13px;font-weight:500;color:var(--gray-900)}
     .share-sub{font-size:11px;color:var(--gray-400);margin-top:1px}
-    .itin-item:active{cursor:grabbing}
+
     .style-btn-active svg{color:var(--blue-600)}
     @media(max-width:768px){
       .interests-grid{grid-template-columns:1fr 1fr}
@@ -1435,9 +1433,9 @@ function buildItinItem(item,n,destination){
   const driveRow=driveText?'<div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--gray-400);margin-bottom:3px">'+driveIcoS+" "+driveText+"</div>":"";
   const mapsBtn='<a href="'+mapsLink+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:3px;font-size:10px;color:var(--blue-600);text-decoration:none;background:var(--blue-50);border:1px solid var(--blue-100);border-radius:20px;padding:2px 8px">'+mapIcoS+" Maps</a>";
   const igBtn='<a href="'+igLink+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:3px;font-size:10px;color:#C13584;text-decoration:none;background:#FDF3F8;border:1px solid #F4C0D1;border-radius:20px;padding:2px 8px">'+igIcoS+" Instagram</a>";
-  return '<div class="itin-item" data-day="'+di+'" data-slot="'+slotName+'">'
+  return '<div class="itin-item">'
     +'<div style="display:flex;align-items:flex-start;gap:10px">'
-    +'<div class="itin-num" title="Hold and drag to move — even between days" style="cursor:grab">'+n+'</div>'
+    +'<div class="itin-num">'+n+'</div>'
     +'<div class="itin-body" style="flex:1">'
     +'<div class="itin-name">'+item.name+aiPick+'</div>'
     +driveRow
@@ -1544,7 +1542,7 @@ function renderItinerary(){
   const planHdr=document.createElement("div");
   planHdr.innerHTML='<div class="section-label">Your day-by-day plan</div>'
     +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">'
-    +'<p style="font-size:12px;color:var(--gray-400);margin:0">Drag any stop to reorder. Times shown are average visit durations.</p>'
+    +'<p style="font-size:12px;color:var(--gray-400);margin:0">Times shown are average visit durations based on traveller data.</p>'
     +'<div style="display:flex;gap:8px">'
     +'<button onclick="expandAllDays()" style="font-size:11px;color:var(--blue-600);background:var(--blue-50);border:1px solid var(--blue-100);border-radius:var(--radius-sm);padding:4px 10px;cursor:pointer">Expand all</button>'
     +'<button onclick="collapseAllDays()" style="font-size:11px;color:var(--gray-600);background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-sm);padding:4px 10px;cursor:pointer">Collapse all</button>'
@@ -1584,7 +1582,7 @@ function renderItinerary(){
   const note=document.createElement("div");
   note.innerHTML='<div style="background:var(--blue-50);border:1px solid var(--blue-100);border-radius:var(--radius-lg);padding:1.25rem;margin-top:1rem">'
     +'<div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--blue-600);margin-bottom:6px">Plan note</div>'
-    +'<div style="font-size:13px;color:var(--blue-800);line-height:1.65">Stops marked <strong>AI pick</strong> were added to complete your day. Drive times are approximate — always check live traffic. Drag stops to reorder within any time slot.</div>'
+    +'<div style="font-size:13px;color:var(--blue-800);line-height:1.65">Stops marked <strong>AI pick</strong> were added to complete your day. Drive times are approximate — always check live traffic. </div>'
     +'</div>';
   rv.appendChild(note);
 
@@ -1623,7 +1621,6 @@ function renderItinerary(){
   btn.onclick=restart;
   rv.appendChild(btn);
 
-  initDragDrop();
 }
 
 function buildShareText(){
@@ -1641,99 +1638,7 @@ function buildShareText(){
   return txt;
 }
 
-// ── DRAG & DROP — pointer events, works mouse + touch + cross-day ──
-let dnd={active:false,el:null,clone:null,srcContainer:null,placeholder:null,startX:0,startY:0,offX:0,offY:0};
 
-function initDragDrop(){
-  document.querySelectorAll(".itin-item").forEach(function(el){
-    el.addEventListener("mousedown",dndStart,{passive:false});
-    el.addEventListener("touchstart",dndStart,{passive:false});
-  });
-}
-
-function dndStart(e){
-  // Only start drag from the handle number or the item itself, not links/buttons
-  if(e.target.closest("a")||e.target.closest("button"))return;
-  e.preventDefault();
-  const el=e.currentTarget;
-  const rect=el.getBoundingClientRect();
-  const clientX=e.touches?e.touches[0].clientX:e.clientX;
-  const clientY=e.touches?e.touches[0].clientY:e.clientY;
-
-  // Create floating clone
-  const clone=el.cloneNode(true);
-  clone.style.cssText="position:fixed;z-index:9999;pointer-events:none;width:"+rect.width+"px;opacity:0.85;box-shadow:0 8px 24px rgba(0,0,0,0.15);border-radius:var(--radius-md);border:2px solid var(--blue-600);background:#fff;left:"+(rect.left)+"px;top:"+(rect.top)+"px;";
-  document.body.appendChild(clone);
-
-  // Create placeholder
-  const ph=document.createElement("div");
-  ph.className="dnd-placeholder";
-  ph.style.cssText="height:"+rect.height+"px;border:2px dashed var(--blue-100);border-radius:var(--radius-md);background:var(--blue-50);margin-bottom:6px;transition:height .15s;";
-  el.parentNode.insertBefore(ph,el);
-  el.style.display="none";
-
-  dnd={active:true,el:el,clone:clone,srcContainer:el.parentNode,placeholder:ph,
-    startX:clientX,startY:clientY,offX:clientX-rect.left,offY:clientY-rect.top};
-
-  document.addEventListener("mousemove",dndMove,{passive:false});
-  document.addEventListener("touchmove",dndMove,{passive:false});
-  document.addEventListener("mouseup",dndEnd);
-  document.addEventListener("touchend",dndEnd);
-}
-
-function dndMove(e){
-  if(!dnd.active)return;
-  e.preventDefault();
-  const clientX=e.touches?e.touches[0].clientX:e.clientX;
-  const clientY=e.touches?e.touches[0].clientY:e.clientY;
-
-  // Move clone
-  dnd.clone.style.left=(clientX-dnd.offX)+"px";
-  dnd.clone.style.top=(clientY-dnd.offY)+"px";
-
-  // Find which slot-items container we're hovering over
-  dnd.clone.style.pointerEvents="none";
-  const elBelow=document.elementFromPoint(clientX,clientY);
-  dnd.clone.style.pointerEvents="";
-  if(!elBelow)return;
-
-  const targetContainer=elBelow.closest(".slot-items");
-  if(!targetContainer)return;
-
-  // Find insertion point within target container
-  const siblings=[...targetContainer.querySelectorAll(".itin-item:not([style*='display: none'])")];
-  let insertBefore=null;
-  for(let i=0;i<siblings.length;i++){
-    const sRect=siblings[i].getBoundingClientRect();
-    if(clientY<sRect.top+sRect.height/2){insertBefore=siblings[i];break;}
-  }
-
-  // Move placeholder to target position
-  if(insertBefore){
-    targetContainer.insertBefore(dnd.placeholder,insertBefore);
-  }else{
-    targetContainer.appendChild(dnd.placeholder);
-  }
-}
-
-function dndEnd(e){
-  if(!dnd.active)return;
-
-  // Drop element at placeholder position
-  dnd.el.style.display="";
-  if(dnd.placeholder.parentNode){
-    dnd.placeholder.parentNode.insertBefore(dnd.el,dnd.placeholder);
-    dnd.placeholder.remove();
-  }
-  dnd.clone.remove();
-
-  // Clean up
-  document.removeEventListener("mousemove",dndMove);
-  document.removeEventListener("touchmove",dndMove);
-  document.removeEventListener("mouseup",dndEnd);
-  document.removeEventListener("touchend",dndEnd);
-  dnd={active:false,el:null,clone:null,srcContainer:null,placeholder:null,startX:0,startY:0,offX:0,offY:0};
-}
 
 function saveLastSearch(){
   if(!destination)return;
