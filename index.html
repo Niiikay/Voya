@@ -255,7 +255,7 @@
 <div id="loginScreen" class="screen active">
   <div class="login-wrap">
     <div class="login-box">
-      <div class="login-mark">VOYA</div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--blue-600)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg><div class="login-mark" style="margin-bottom:0">VOYA</div></div>
       <div class="login-tag">Your AI travel companion</div>
 
       <!-- Google Sign-In button -->
@@ -316,7 +316,7 @@
 
     <!-- M1: Step 0 - Trip details -->
     <div id="step0">
-      <div class="wordmark">VOYA <button class="settings-btn" onclick="document.getElementById('apiModal').classList.remove('hidden')">Change API key</button></div>
+      <div class="wordmark"><div style="display:flex;align-items:center;gap:8px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue-600)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg><span>VOYA</span></div><button class="settings-btn" onclick="document.getElementById('apiModal').classList.remove('hidden')">Change API key</button></div>
       <div class="dots"><div class="dot-active"></div><div class="dot"></div><div class="dot"></div></div>
       <h1 class="heading">Where are you headed?</h1>
       <p class="subtext">AI-powered travel intelligence for every kind of explorer.</p>
@@ -340,7 +340,7 @@
 
     <!-- M1: Step 1 - Interests -->
     <div id="step1" style="display:none">
-      <div class="wordmark">VOYA</div>
+      <div class="wordmark"><div style="display:flex;align-items:center;gap:8px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue-600)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg><span>VOYA</span></div></div>
       <div class="dots"><div class="dot"></div><div class="dot-active"></div><div class="dot"></div></div>
       <button class="btn-ghost" onclick="goToStep0()">&#8592; Back</button>
       <h1 class="heading">What moves you?</h1>
@@ -351,7 +351,7 @@
 
     <!-- M1: Step 2 - Results -->
     <div id="step2" style="display:none">
-      <div class="wordmark">VOYA</div>
+      <div class="wordmark"><div style="display:flex;align-items:center;gap:8px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue-600)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg><span>VOYA</span></div></div>
       <div id="loadingView" class="loading-screen">
         <div class="loading-dest" id="loadingDest"></div>
         <div class="spinner"></div>
@@ -362,7 +362,7 @@
 
     <!-- M2: Step A - Sub-interests + pace + style -->
     <div id="m2stepA" style="display:none">
-      <div class="wordmark">VOYA</div>
+      <div class="wordmark"><div style="display:flex;align-items:center;gap:8px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue-600)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg><span>VOYA</span></div></div>
       <button class="btn-ghost" onclick="backToResults()">&#8592; Back to spots</button>
       <h1 class="heading">Plan your days</h1>
       <p class="subtext">Tell us what each day should feel like — we'll build your itinerary around it.</p>
@@ -407,7 +407,7 @@
 
     <!-- M2: Step B - Confirm spots -->
     <div id="m2stepB" style="display:none">
-      <div class="wordmark">VOYA</div>
+      <div class="wordmark"><div style="display:flex;align-items:center;gap:8px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue-600)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg><span>VOYA</span></div></div>
       <button class="btn-ghost" onclick="document.getElementById('m2stepA').style.display='block';document.getElementById('m2stepB').style.display='none'">&#8592; Back</button>
       <h1 class="heading">Confirm your spots</h1>
       <p class="subtext">These are your AI-suggested spots. Uncheck any you'd like to skip — we'll build your schedule around what's left.</p>
@@ -630,7 +630,7 @@ const HELP_OPTIONS=[
   {id:"outfits",label:"Outfit planner",sub:"What to wear per spot",module:3},
 ];
 
-let selInterests=[],destination="",flyingFrom="",dateFrom="",dateTo="",result=null;
+let selInterests=[],destination="",flyingFrom="",dateFrom="",dateTo="",result=null,eventsData=[];
 let selSubs=[],confirmedSpots=[],itinerary=null;
 let loadingInterval=null,loadingIdx=0,acTimer=null,itinInterval=null,itinIdx=0;
 let tripPace=4,travelStyle="both";
@@ -925,7 +925,8 @@ Include 4-6 events. If you are not certain of a specific event, suggest the type
     const d=await r.json();
     if(d.error)throw new Error(d.error.message);
     const events=JSON.parse(d.choices[0].message.content.replace(/```json|```/g,"").trim());
-    renderEvents(events.events||[]);
+    eventsData=events.events||[];
+    renderEvents(eventsData);
   }catch(e){
     evEl.innerHTML="";// silently fail — events is a bonus feature
   }
@@ -1033,8 +1034,10 @@ function updateCurrency(){
   const note=document.getElementById("currencyNote");
   if(note){
     if(selectedCurrency==="USD"){note.textContent="";}
-    else{note.textContent="~"+sym+(rate*50).toFixed(0)+"–"+sym+(rate*150).toFixed(0)+" typical daily budget";}
+    else{note.textContent="~"+sym+Math.round(rate*50).toLocaleString()+"–"+sym+Math.round(rate*150).toLocaleString()+" typical daily budget";}
   }
+  // Re-render events with new currency
+  if(eventsData&&eventsData.length)renderEvents(eventsData);
 }
 
 function convertPrice(usdAmount){
@@ -1042,6 +1045,18 @@ function convertPrice(usdAmount){
   const sym=CURRENCY_SYMBOLS[selectedCurrency]||"$";
   const converted=Math.round(usdAmount*rate);
   return sym+converted.toLocaleString();
+}
+
+function convertEventPrice(priceStr){
+  if(!priceStr||priceStr.toLowerCase()==="free")return"Free";
+  if(selectedCurrency==="USD")return priceStr;
+  const rate=CURRENCY_RATES[selectedCurrency]||1;
+  const sym=CURRENCY_SYMBOLS[selectedCurrency]||"$";
+  // Extract numbers from string like "$20-80" or "$50-100"
+  const nums=priceStr.match(/\d+/g);
+  if(!nums||!nums.length)return priceStr;
+  const converted=nums.map(function(n){return Math.round(parseInt(n)*rate).toLocaleString();});
+  return sym+converted.join("–");
 }
 
 function renderResults(){
@@ -1234,10 +1249,11 @@ async function buildItinerary(){
   const numDays=Math.max(1,Math.round((new Date(dateTo)-new Date(dateFrom))/(1000*60*60*24)));
   const spotsStr=kept.map(s=>`${s.name} (${s.type}, ${s.neighborhood||"central"})`).join(", ");
   const excludedStr=confirmedSpots.filter(s=>!s.confirmed).map(s=>s.name).join(", ");
+  const includedNames=kept.map(s=>s.name).join(", ");
   const subsStr=selSubs.length?selSubs.join(", "):"general";
   const styleNote=travelStyle==="tourist"?"Focus on iconic, well-known tourist attractions":travelStyle==="local"?"Focus on hidden gems, local favorites, off-the-beaten-path spots":"Mix iconic tourist spots with local hidden gems equally";
 
-  const prompt=`You are a travel itinerary AI for VOYA. Build a ${numDays}-day itinerary for ${destination} with these confirmed spots: ${spotsStr}. User sub-interests: ${subsStr}. Travel style: ${styleNote}. Max spots per day: ${tripPace}. NEVER include these excluded spots: ${excludedStr||"none"}.
+  const prompt=`You are a travel itinerary AI for VOYA. Build a ${numDays}-day itinerary for ${destination} with these confirmed spots: ${spotsStr}. User sub-interests: ${subsStr}. Travel style: ${styleNote}. Max spots per day: ${tripPace}. ONLY use these confirmed spots: ${includedNames}. NEVER include these excluded spots under any circumstances: ${excludedStr||"none"}.
 
 Rules:
 - NEVER exceed ${tripPace} spots per day total across all slots
@@ -1403,6 +1419,7 @@ function renderItinerary(){
   share.style.cssText="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--gray-100)";
   share.innerHTML=
     '<div style="font-family:var(--font-display);font-size:22px;font-weight:400;color:var(--gray-900);margin-bottom:6px">Share your itinerary</div>'
+    +'<div style="font-size:13px;color:var(--gray-400);margin-bottom:1.25rem">Send this plan to a travel buddy or save it for later</div>'
     +'<div style="font-size:13px;color:var(--gray-400);margin-bottom:1.25rem">Send this plan to a travel buddy or save it for yourself</div>'
     +'<div class="share-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
     +'<a href="'+waUrl+'" target="_blank" rel="noopener" class="share-btn share-wa" onclick="track(&quot;itinerary_shared&quot;,{method:&quot;whatsapp&quot;,destination:destination})">'
