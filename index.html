@@ -20,6 +20,8 @@
       }
     }
   </script>
+  <!-- Google Sign-In — replace 622034097373-frmmi1ut22kptfuk9fjdri28l83mnqd8.apps.googleusercontent.com with your OAuth Client ID -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <style>
@@ -61,7 +63,7 @@
     .dots{display:flex;gap:5px;align-items:center;margin-bottom:2rem}
     .dot{width:5px;height:5px;border-radius:50%;background:var(--gray-200)}
     .dot-active{width:18px;height:5px;border-radius:3px;background:var(--blue-600)}
-    .heading{font-family:var(--font-display);font-size:36px;font-weight:400;line-height:1.18;color:var(--gray-900);margin-bottom:10px}
+    .heading{font-family:var(--font-display);font-size:32px;font-weight:400;line-height:1.2;color:var(--gray-900);margin-bottom:8px;white-space:nowrap}
     .subtext{font-size:15px;color:var(--gray-600);line-height:1.65;margin-bottom:2rem}
     .section-label{font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--gray-400);margin:1.5rem 0 .75rem}
 
@@ -137,11 +139,11 @@
     .info-text{font-size:13px;color:var(--teal-800);line-height:1.65}
 
     /* BUILD ITINERARY BANNER */
-    .itin-banner{background:var(--blue-600);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;margin-top:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+    .itin-banner{background:var(--blue-600);border-radius:var(--radius-md);padding:.85rem 1.1rem;margin-top:1.25rem;display:flex;align-items:center;justify-content:space-between;gap:.75rem}
     .itin-banner-text{color:#fff}
-    .itin-banner-title{font-size:16px;font-weight:500;margin-bottom:3px}
-    .itin-banner-sub{font-size:12px;opacity:.8}
-    .itin-banner-btn{background:#fff;color:var(--blue-600);border:none;border-radius:var(--radius-sm);padding:9px 18px;font-family:var(--font-body);font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
+    .itin-banner-title{font-size:14px;font-weight:500;margin-bottom:2px}
+    .itin-banner-sub{font-size:11px;opacity:.8}
+    .itin-banner-btn{background:#fff;color:var(--blue-600);border:none;border-radius:var(--radius-sm);padding:7px 14px;font-family:var(--font-body);font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap}
     .itin-banner-btn:hover{background:var(--blue-50)}
 
     /* HELP SECTION */
@@ -172,12 +174,12 @@
     .cat-header{font-size:12px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--blue-600);margin:1.25rem 0 .6rem;padding-bottom:4px;border-bottom:1px solid var(--blue-100)}
 
     /* Spot confirm list */
-    .confirm-spot{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-md);padding:1rem;margin-bottom:8px;display:flex;align-items:flex-start;gap:12px;transition:all .15s}
+    .confirm-spot{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-md);padding:.7rem .9rem;margin-bottom:6px;display:flex;align-items:flex-start;gap:10px;transition:all .15s}
     .confirm-spot.removed{opacity:.4;border-style:dashed}
     .confirm-check{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--gray-200);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-top:2px;transition:all .15s}
     .confirm-check.checked{background:var(--teal-600);border-color:var(--teal-600);color:#fff}
     .confirm-spot-body{flex:1}
-    .confirm-spot-name{font-size:15px;font-weight:500;color:var(--gray-900);margin-bottom:2px}
+    .confirm-spot-name{font-size:14px;font-weight:500;color:var(--gray-900);margin-bottom:1px}
     .confirm-spot-meta{font-size:12px;color:var(--gray-400)}
     .confirm-badge{display:inline-block;font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:4px;margin-right:4px}
     .cb-must{background:var(--blue-600);color:#fff}
@@ -212,8 +214,12 @@
     .style-btn-active .style-label{color:var(--blue-800)}
     .style-desc{font-size:11px;color:var(--gray-400);line-height:1.3}
     .style-btn svg{color:var(--gray-400);margin:0 auto;display:block}
-    .itin-item{cursor:grab;transition:border-color .15s,opacity .15s}
+    .itin-item{cursor:grab;transition:border-color .15s,opacity .15s;position:relative}
     .share-btn{display:flex;align-items:center;gap:10px;padding:14px 16px;background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-lg);text-decoration:none;transition:border-color .15s}
+    .community-photos{display:flex;gap:6px;margin-top:8px;overflow-x:auto;padding-bottom:2px}
+    .community-photo{width:54px;height:54px;border-radius:var(--radius-sm);object-fit:cover;flex-shrink:0;border:1px solid var(--gray-200)}
+    .upload-photo-btn{width:54px;height:54px;border-radius:var(--radius-sm);border:1.5px dashed var(--gray-200);background:var(--gray-50);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:var(--gray-400);font-size:20px;transition:border-color .15s}
+    .upload-photo-btn:hover{border-color:var(--blue-600);color:var(--blue-600)}
     .share-wa:hover{border-color:#25D366}
     .share-email:hover{border-color:var(--blue-600)}
     .share-ico{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -223,11 +229,27 @@
     .share-sub{font-size:11px;color:var(--gray-400);margin-top:1px}
     .itin-item:active{cursor:grabbing}
     .style-btn-active svg{color:var(--blue-600)}
-    @media(max-width:480px){
-      .app{padding:2rem 1rem 4rem}
-      .heading{font-size:30px}
-      .row-2,.sub-grid{grid-template-columns:1fr}
+    @media(max-width:600px){
+      .app{padding:1.5rem 1rem 4rem}
+      .heading{font-size:26px;white-space:normal}
+      .row-2{grid-template-columns:1fr 1fr}
+      .sub-grid{grid-template-columns:1fr}
       .itin-banner{flex-direction:column;align-items:flex-start}
+      .interests-grid{grid-template-columns:1fr 1fr}
+      .help-grid{grid-template-columns:1fr 1fr}
+      .wordmark{font-size:16px}
+      .spot-img{height:140px}
+      .login-box{padding:2rem 1.25rem}
+      .login-mark{font-size:24px}
+      .share-grid{grid-template-columns:1fr}
+      .day-title{font-size:15px}
+      .itin-item{padding-bottom:28px}
+    }
+    @media(max-width:380px){
+      .heading{font-size:22px}
+      .row-2{grid-template-columns:1fr}
+      .interests-grid{grid-template-columns:1fr}
+      .help-grid{grid-template-columns:1fr}
     }
   </style>
 </head>
@@ -239,15 +261,41 @@
     <div class="login-box">
       <div class="login-mark">VOYA</div>
       <div class="login-tag">Your AI travel companion</div>
-      <div class="login-hint">
-        <div class="lh-label">Demo credentials</div>
+
+      <!-- Google Sign-In button -->
+      <div id="googleSignInBtn" style="display:flex;justify-content:center;margin-bottom:1.25rem">
+        <div id="g_id_onload"
+          data-client_id="622034097373-frmmi1ut22kptfuk9fjdri28l83mnqd8.apps.googleusercontent.com"
+          data-callback="handleGoogleSignIn"
+          data-auto_prompt="false">
+        </div>
+        <div class="g_id_signin"
+          data-type="standard"
+          data-size="large"
+          data-theme="outline"
+          data-text="sign_in_with"
+          data-shape="rectangular"
+          data-logo_alignment="left"
+          data-width="320">
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.25rem">
+        <div style="flex:1;height:1px;background:var(--gray-200)"></div>
+        <span style="font-size:12px;color:var(--gray-400)">or try the demo</span>
+        <div style="flex:1;height:1px;background:var(--gray-200)"></div>
+      </div>
+
+      <div class="login-hint" style="margin-bottom:1rem">
+        <div class="lh-label" style="margin-bottom:6px">Demo credentials — yes, we're serious</div>
         <div class="lh-row"><span class="lh-key">Username</span><span class="lh-val">SunscreenForgetter99</span></div>
         <div class="lh-row"><span class="lh-key">Password</span><span class="lh-val">passport123</span></div>
+        <div style="font-size:11px;color:var(--gray-400);margin-top:6px;font-style:italic">We don't judge. We've also forgotten sunscreen in Bali.</div>
       </div>
-      <div class="field"><label>Username</label><input type="text" id="loginUser" placeholder="Enter username" autocomplete="off"/></div>
-      <div class="field"><label>Password</label><input type="password" id="loginPass" placeholder="Enter password"/></div>
-      <button class="btn-primary" onclick="doLogin()">Sign in &rarr;</button>
-      <div class="login-error" id="loginError">Hmm, that's not right — check the hint above!</div>
+      <div class="field"><label>Username</label><input type="text" id="loginUser" placeholder="SunscreenForgetter99" autocomplete="off"/></div>
+      <div class="field"><label>Password</label><input type="password" id="loginPass" placeholder="passport123"/></div>
+      <button class="btn-primary" onclick="doLogin()">Let me in &rarr;</button>
+      <div class="login-error" id="loginError">That's not it — the sunscreen doesn't lie though, check above!</div>
     </div>
   </div>
 </div>
@@ -274,7 +322,7 @@
     <div id="step0">
       <div class="wordmark">VOYA <button class="settings-btn" onclick="document.getElementById('apiModal').classList.remove('hidden')">Change API key</button></div>
       <div class="dots"><div class="dot-active"></div><div class="dot"></div><div class="dot"></div></div>
-      <h1 class="heading">Where are<br>you headed?</h1>
+      <h1 class="heading">Where are you headed?</h1>
       <p class="subtext">AI-powered travel intelligence for every kind of explorer.</p>
       <div class="field">
         <label>Flying from</label>
@@ -299,7 +347,7 @@
       <div class="wordmark">VOYA</div>
       <div class="dots"><div class="dot"></div><div class="dot-active"></div><div class="dot"></div></div>
       <button class="btn-ghost" onclick="goToStep0()">&#8592; Back</button>
-      <h1 class="heading">What moves<br>you?</h1>
+      <h1 class="heading">What moves you?</h1>
       <p class="subtext">Select your interests — every recommendation will be tailored to match.</p>
       <div class="interests-grid" id="interestsGrid"></div>
       <button class="btn-primary" onclick="analyze()">Analyze my trip &rarr;</button>
@@ -320,7 +368,7 @@
     <div id="m2stepA" style="display:none">
       <div class="wordmark">VOYA</div>
       <button class="btn-ghost" onclick="backToResults()">&#8592; Back to spots</button>
-      <h1 class="heading">Plan your<br>days</h1>
+      <h1 class="heading">Plan your days</h1>
       <p class="subtext">Tell us what each day should feel like — we'll build your itinerary around it.</p>
 
       <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1.5rem">
@@ -365,7 +413,7 @@
     <div id="m2stepB" style="display:none">
       <div class="wordmark">VOYA</div>
       <button class="btn-ghost" onclick="document.getElementById('m2stepA').style.display='block';document.getElementById('m2stepB').style.display='none'">&#8592; Back</button>
-      <h1 class="heading">Confirm<br>your spots</h1>
+      <h1 class="heading">Confirm your spots</h1>
       <p class="subtext">These are your AI-suggested spots. Uncheck any you'd like to skip — we'll build your schedule around what's left.</p>
       <div id="confirmList"></div>
       <button class="btn-primary" onclick="buildItinerary()">Generate itinerary &rarr;</button>
@@ -490,6 +538,14 @@ const CITIES=[
   "Green Bay, Wisconsin","Madison, Wisconsin","Milwaukee, Wisconsin",
   // Wyoming
   "Cheyenne, Wyoming","Jackson, Wyoming","Yellowstone, Wyoming",
+  // India
+  "Agra, India","Ahmedabad, India","Amritsar, India","Bangalore, India",
+  "Bhopal, India","Chennai, India","Coorg, India","Delhi, India",
+  "Goa, India","Gurgaon, India","Hyderabad, India","Jaipur, India",
+  "Jodhpur, India","Kochi, India","Kolkata, India","Lucknow, India",
+  "Mangalore, India","Mumbai, India","Mysore, India","Noida, India",
+  "Ooty, India","Pune, India","Rishikesh, India","Shimla, India",
+  "Udaipur, India","Varanasi, India","Visakhapatnam, India",
   // International
   "Abu Dhabi, UAE","Amsterdam, Netherlands","Athens, Greece","Auckland, New Zealand",
   "Bangkok, Thailand","Barcelona, Spain","Beijing, China","Berlin, Germany",
@@ -590,21 +646,64 @@ function setStyle(s){
 }
 
 /* ── LOGIN ── */
+// Google Sign-In handler
+function handleGoogleSignIn(response){
+  try{
+    const payload=JSON.parse(atob(response.credential.split('.')[1]));
+    const name=payload.given_name||payload.name||"Traveler";
+    const email=payload.email||"";
+    const pic=payload.picture||"";
+    localStorage.setItem("voya_user", JSON.stringify({name, email, pic, method:"google"}));
+    enterApp(name, pic, "google");
+  }catch(e){
+    alert("Google Sign-In failed. Try the demo login instead.");
+  }
+}
+
+function enterApp(name, pic, method){
+  document.getElementById("loginScreen").classList.remove("active");
+  document.getElementById("appScreen").classList.add("active");
+  track("login", {method: method});
+  // Update wordmark to show user
+  const wm=document.querySelector(".wordmark");
+  if(wm&&name){
+    const avatar=pic
+      ?'<img src="'+pic+'" style="width:28px;height:28px;border-radius:50%;object-fit:cover;border:1px solid var(--gray-200)" />'
+      :'<div style="width:28px;height:28px;border-radius:50%;background:var(--blue-50);border:1px solid var(--blue-100);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:var(--blue-600)">'+name[0].toUpperCase()+'</div>';
+    const existing=wm.querySelector(".user-chip");
+    if(!existing){
+      const chip=document.createElement("div");
+      chip.className="user-chip";
+      chip.style.cssText="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--gray-600)";
+      chip.innerHTML=avatar+'<span>'+name+'</span>';
+      wm.appendChild(chip);
+    }
+  }
+  if(!getKey()) document.getElementById("apiModal").classList.remove("hidden");
+}
+
 function doLogin(){
   const u=document.getElementById("loginUser").value.trim();
   const p=document.getElementById("loginPass").value.trim();
   if(u==="SunscreenForgetter99"&&p==="passport123"){
-    document.getElementById("loginScreen").classList.remove("active");
-    document.getElementById("appScreen").classList.add("active");
-    track('login', {method: 'demo'});
-    if(!getKey()){
-    document.getElementById("apiModal").classList.remove("hidden");
+    localStorage.setItem("voya_user", JSON.stringify({name:"SunscreenForgetter99", email:"", pic:"", method:"demo"}));
+    enterApp("SunscreenForgetter99","","demo");
+  }else{
+    document.getElementById("loginError").style.display="block";
   }
-  const savedPexels=localStorage.getItem("voya_pexels_key");
-  if(savedPexels){const pe=document.getElementById("pexelsKeyInput");if(pe)pe.value=savedPexels;}
-  }else{document.getElementById("loginError").style.display="block";}
 }
 document.addEventListener("keydown",e=>{if(e.key==="Enter"&&document.getElementById("loginScreen").classList.contains("active"))doLogin();});
+
+// Auto-login if returning user
+window.addEventListener("load",()=>{
+  const saved=localStorage.getItem("voya_user");
+  if(saved){
+    try{
+      const u=JSON.parse(saved);
+      enterApp(u.name,u.pic,u.method);
+    }catch(e){localStorage.removeItem("voya_user");}
+  }
+});
 
 /* ── API KEY ── */
 function saveKey(){
@@ -714,7 +813,7 @@ function validateStep0(){
   document.getElementById("btnNext0").disabled=!(flyingFrom&&destination&&dateFrom&&dateTo&&!dateErr);
 }
 
-window.addEventListener("load",()=>{
+window.addEventListener("DOMContentLoaded",()=>{
   // Build M1 interests grid
   const grid=document.getElementById("interestsGrid");
   M1_INTERESTS.forEach(i=>{
@@ -771,8 +870,8 @@ async function analyze(){
   const interests=selInterests.length?selInterests.join(", "):"general travel";
   const prompt=`Travel AI for VOYA. User flying from ${flyingFrom} to ${destination}. Arrives ${dateFrom}, departs ${dateTo}. Interests: ${interests}.
 Return ONLY valid JSON no markdown:
-{"vibe":"2-sentence description of ${destination} this season","weather":"brief historical weather","temp":"temp range like 68-82F","packing":["6-8 packing items"],"outfitNote":"one sentence outfit note","spots":[{"name":"Place","type":"food|nightlife|nature|culture|shopping|adventure|photography|experience","tag":"one word","desc":"2 sentences why special","score":9,"mustVisit":true,"photoTip":"specific photo tip","imgQ":"2-3 word image search","neighborhood":"area or neighborhood name"}],"contentTip":"best content creator tip","eventsNote":"seasonal events to look for"}
-Include 6 spots scored 1-10 (8+ is must-go). Be specific and local.`;
+{"vibe":"2-sentence description of ${destination} this season","weather":"brief historical weather","temp":"temp range like 68-82F","packing":["6-8 packing items"],"outfitNote":"one sentence outfit note","spots":[{"name":"Place","type":"food|nightlife|nature|culture|shopping|adventure|photography|experience","tag":"one word","desc":"2 sentences why special","score":9,"mustVisit":true,"photoTip":"specific photo tip","imgQ":"2-3 word image search","neighborhood":"area or neighborhood name"},...12 total spots...],"contentTip":"best content creator tip","eventsNote":"seasonal events to look for"}
+Include exactly 12 spots scored 1-10 (8+ is must-go). Be specific and local. Vary types based on interests.`;
   try{
     const r=await fetch("https://api.groq.com/openai/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":`Bearer ${getKey()}`},body:JSON.stringify({model:"llama-3.3-70b-versatile",messages:[{role:"user",content:prompt}],temperature:.7,max_tokens:1800})});
     const d=await r.json();if(d.error)throw new Error(d.error.message);
@@ -990,6 +1089,42 @@ function goToM2Confirm(){
   renderConfirmList();
 }
 
+function getCommunityPhotos(spotName){
+  const key="voya_photos_"+spotName.toLowerCase().replace(/\s+/g,"_");
+  try{
+    const photos=JSON.parse(localStorage.getItem(key)||"[]");
+    return photos.map(function(src){
+      return '<img class="community-photo" src="'+src+'" title="Community photo" />';
+    }).join("");
+  }catch(e){return "";}
+}
+
+function triggerPhotoUpload(idx, spotName){
+  document.getElementById("file-"+idx).click();
+}
+
+function handlePhotoUpload(event, idx, spotName){
+  const file=event.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const src=e.target.result;
+    const key="voya_photos_"+spotName.toLowerCase().replace(/\s+/g,"_");
+    try{
+      const photos=JSON.parse(localStorage.getItem(key)||"[]");
+      photos.unshift(src);
+      localStorage.setItem(key, JSON.stringify(photos.slice(0,5)));
+      const container=document.getElementById("cphoto-"+idx);
+      if(container){
+        const img=document.createElement("img");
+        img.className="community-photo";img.src=src;img.title="Your photo";
+        container.insertBefore(img, container.firstChild);
+      }
+    }catch(ex){console.error(ex);}
+  };
+  reader.readAsDataURL(file);
+}
+
 function renderConfirmList(){
   const el=document.getElementById("confirmList");
   el.innerHTML=confirmedSpots.map((s,i)=>{
@@ -1007,10 +1142,15 @@ function renderConfirmList(){
         <div class="confirm-spot-name">${s.name}</div>
         <div class="confirm-spot-meta">${s.type} &middot; ${s.neighborhood||destination}</div>
         <div style="font-size:11px;color:var(--teal-600);margin-top:3px">Approx. visit time: ${dur}</div>
-        <div style="display:flex;gap:8px;margin-top:8px">
+        <div style="display:flex;gap:8px;margin-top:6px">
           <a href="${mapsUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--blue-600);text-decoration:none;background:var(--blue-50);border:1px solid var(--blue-100);border-radius:20px;padding:3px 10px">${mapIco} Google Maps</a>
           <a href="${igUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#C13584;text-decoration:none;background:#FDF3F8;border:1px solid #F4C0D1;border-radius:20px;padding:3px 10px">${igIco} Instagram</a>
         </div>
+        <div class="community-photos" id="cphoto-${i}">
+          ${getCommunityPhotos(s.name)}
+          <div class="upload-photo-btn" onclick="triggerPhotoUpload(${i},'${s.name.replace(/'/g,'')}')" title="Add your photo">+</div>
+        </div>
+        <input type="file" id="file-${i}" accept="image/*" style="display:none" onchange="handlePhotoUpload(event,${i},'${s.name.replace(/'/g,'')}')"/>
       </div>
     </div>`;
   }).join("");
@@ -1110,10 +1250,8 @@ function buildItinItem(item,n,destination){
     +'<div class="itin-name">'+item.name+aiPick+'</div>'
     +driveRow
     +'<div class="itin-tip">'+item.tip+'</div>'
-    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">'
-    +'<div style="display:flex;gap:5px">'+mapsBtn+igBtn+'</div>'
-    +'<span style="font-size:10px;color:var(--gray-400);white-space:nowrap" title="Average time travellers spend here">'+durText+' avg visit</span>'
-    +'</div>'
+    +'<div style="display:flex;align-items:center;margin-top:8px;gap:5px">'+mapsBtn+igBtn+'</div>'
+    +'<div style="position:absolute;bottom:10px;right:12px;font-size:10px;color:var(--gray-400);white-space:nowrap" title="Average time travellers spend here">'+durText+' avg visit</div>'
     +'</div></div></div>';
 }
 
@@ -1207,7 +1345,7 @@ function renderItinerary(){
   share.innerHTML=
     '<div style="font-family:var(--font-display);font-size:22px;font-weight:400;color:var(--gray-900);margin-bottom:6px">Share your itinerary</div>'
     +'<div style="font-size:13px;color:var(--gray-400);margin-bottom:1.25rem">Send this plan to a travel buddy or save it for yourself</div>'
-    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
+    +'<div class="share-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
     +'<a href="'+waUrl+'" target="_blank" rel="noopener" class="share-btn share-wa" onclick="track(&quot;itinerary_shared&quot;,{method:&quot;whatsapp&quot;,destination:destination})">'
     +'<div class="share-ico share-ico-wa">'
     +'<svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>'
