@@ -52,13 +52,13 @@
     /* MODAL */
     .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:100;padding:1rem}
     .modal-overlay.hidden{display:none}
-    .modal{background:#fff;border-radius:var(--radius-lg);padding:2rem;max-width:420px;width:100%;border:1px solid var(--gray-200)}
+    .modal{background:#fff;border-radius:var(--radius-lg);padding:2rem;max-width:480px;width:100%;border:1px solid var(--gray-200)}
     .modal-title{font-family:var(--font-display);font-size:24px;font-weight:400;margin-bottom:8px}
     .modal-sub{font-size:14px;color:var(--gray-600);line-height:1.6;margin-bottom:1.5rem}
     .modal-sub a{color:var(--blue-600);text-decoration:none}
 
     /* APP LAYOUT */
-    .app{max-width:560px;margin:0 auto;padding:2.5rem 1.5rem 5rem}
+    .app{max-width:960px;margin:0 auto;padding:2.5rem 2rem 5rem}
     .wordmark{font-family:var(--font-display);font-size:18px;font-weight:400;letter-spacing:.25em;color:var(--gray-900);margin-bottom:2.5rem;display:flex;justify-content:space-between;align-items:center}
     .settings-btn{font-size:12px;color:var(--gray-400);cursor:pointer;background:none;border:none;font-family:var(--font-body)}
     .settings-btn:hover{color:var(--gray-600)}
@@ -93,7 +93,7 @@
     .btn-ghost:hover{color:var(--gray-900)}
 
     /* INTEREST CARDS M1 */
-    .interests-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:2rem}
+    .interests-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:2rem}
     .interest-card{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-md);padding:14px 16px;cursor:pointer;transition:border-color .15s;user-select:none}
     .interest-card:hover{border-color:var(--gray-400)}
     .interest-card.selected{border:1.5px solid var(--blue-600);background:var(--blue-50)}
@@ -123,8 +123,9 @@
     .outfit-note{font-size:13px;color:var(--teal-600);margin-top:10px;font-style:italic}
 
     /* SPOT CARDS M1 */
-    .spot-card{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:12px}
-    .spot-img{width:100%;height:175px;object-fit:cover;display:block;background:var(--gray-100)}
+    .spots-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:1rem}
+    .spot-card{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-lg);overflow:hidden;display:flex;flex-direction:column}
+    .spot-img{width:100%;height:200px;object-fit:cover;display:block;background:var(--gray-100)}
     .spot-body{padding:1rem 1.2rem}
     .spot-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px}
     .spot-name{font-family:var(--font-display);font-size:21px;font-weight:400;color:var(--gray-900)}
@@ -151,7 +152,7 @@
     /* HELP SECTION */
     .help-section{margin-top:2rem;padding-top:2rem;border-top:1px solid var(--gray-100)}
     .help-heading{font-family:var(--font-display);font-size:24px;font-weight:400;color:var(--gray-900);margin-bottom:1rem}
-    .help-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .help-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
     .help-btn{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-md);padding:1rem;cursor:pointer;text-align:left;width:100%;transition:border-color .15s,background .15s}
     .help-btn:hover{border-color:var(--gray-400);background:var(--gray-50)}
     .help-btn-label{font-size:14px;font-weight:500;color:var(--gray-900)}
@@ -162,7 +163,7 @@
 
     /* ── MODULE 2 STYLES ── */
     /* Sub-interest grid */
-    .sub-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1.5rem}
+    .sub-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1.5rem}
     .sub-card{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-md);padding:11px 14px;cursor:pointer;transition:border-color .15s;user-select:none;display:flex;align-items:center;gap:10px}
     .sub-card:hover{border-color:var(--gray-400)}
     .sub-card.selected{border:1.5px solid var(--blue-600);background:var(--blue-50)}
@@ -176,7 +177,8 @@
     .cat-header{font-size:12px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--blue-600);margin:1.25rem 0 .6rem;padding-bottom:4px;border-bottom:1px solid var(--blue-100)}
 
     /* Spot confirm list */
-    .confirm-spot{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-md);padding:.7rem .9rem;margin-bottom:6px;display:flex;align-items:flex-start;gap:10px;transition:all .15s}
+    .confirm-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+    .confirm-spot{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-md);padding:.7rem .9rem;display:flex;align-items:flex-start;gap:10px;transition:all .15s}
     .confirm-spot.removed{opacity:.4;border-style:dashed}
     .confirm-check{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--gray-200);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-top:2px;transition:all .15s}
     .confirm-check.checked{background:var(--teal-600);border-color:var(--teal-600);color:#fff}
@@ -193,7 +195,8 @@
     .map-note{font-size:12px;color:var(--gray-400);text-align:center;margin-bottom:1rem}
 
     /* Day itinerary */
-    .day-block{margin-bottom:1.5rem}
+    .days-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+    .day-block{margin-bottom:1.5rem;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:1rem}
     .day-title{font-family:var(--font-display);font-size:22px;font-weight:400;color:var(--gray-900);margin-bottom:1rem;padding-bottom:6px;border-bottom:1px solid var(--gray-100)}
     .slot-block{margin-bottom:1rem}
     .slot-label{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--gray-400);margin-bottom:8px;display:flex;align-items:center;gap:6px}
@@ -227,6 +230,14 @@
     .share-sub{font-size:11px;color:var(--gray-400);margin-top:1px}
     .itin-item:active{cursor:grabbing}
     .style-btn-active svg{color:var(--blue-600)}
+    @media(max-width:768px){
+      .interests-grid{grid-template-columns:1fr 1fr}
+      .sub-grid{grid-template-columns:1fr 1fr}
+      .help-grid{grid-template-columns:1fr 1fr}
+      .spots-grid{grid-template-columns:1fr}
+      .confirm-grid{grid-template-columns:1fr}
+      .days-grid{grid-template-columns:1fr}
+    }
     @media(max-width:600px){
       .app{padding:1.5rem 1rem 4rem}
       .heading{font-size:26px;white-space:normal}
@@ -694,6 +705,8 @@ function enterApp(name, pic, method){
     }
   }
   if(!getKey()) document.getElementById("apiModal").classList.remove("hidden");
+  // Restore last search if returning user
+  setTimeout(restoreLastSearch, 100);
 }
 
 function doLogin(){
@@ -1101,6 +1114,7 @@ function renderResults(){
     <div class="chip-wrap">${(result.packing||[]).map(p=>`<span class="chip">${p}</span>`).join("")}</div>
     ${result.outfitNote?`<div class="outfit-note">Style note: ${result.outfitNote}</div>`:""}
     <div class="section-label">Top spots &middot; scored by local recommendation frequency</div>
+    <div class="spots-grid">
     ${(result.spots||[]).map((s,si)=>`
       <div class="spot-card" id="scard-${si}">
         <div style="position:relative">
@@ -1129,6 +1143,7 @@ function renderResults(){
           </div>
         </div>
       </div>`).join("")}
+    </div>
     ${result.contentTip?`<div class="info-box"><div class="info-label">Content creator tip</div><div class="info-text">${result.contentTip}</div></div>`:""}
     ${result.eventsNote?`<div class="info-box" style="margin-top:10px"><div class="info-label">Local events &amp; experiences</div><div class="info-text">${result.eventsNote}</div></div>`:""}
     <div id="eventsSection" style="margin-top:10px"></div>
@@ -1173,7 +1188,7 @@ function goToM2Confirm(){
 
 function renderConfirmList(){
   const el=document.getElementById("confirmList");
-  el.innerHTML=confirmedSpots.map((s,i)=>{
+  el.innerHTML='<div class="confirm-grid">'+confirmedSpots.map((s,i)=>{
     const mapsUrl=`https://www.google.com/maps/search/${encodeURIComponent(s.name+", "+destination)}`;
     const igUrl=`https://www.instagram.com/explore/tags/${encodeURIComponent(s.name.replace(/\s+/g,"").toLowerCase()+destination.split(",")[0].replace(/\s+/g,"").toLowerCase())}`;
     const checkSvg=`<svg width="12" height="12" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>`;
@@ -1195,7 +1210,7 @@ function renderConfirmList(){
 
       </div>
     </div>`;
-  }).join("");
+  }).join("")+'</div>';
 }
 
 function toggleSpot(i){
@@ -1302,13 +1317,15 @@ async function buildItinerary(){
   const prompt=`You are a travel itinerary AI for VOYA. Build a ${numDays}-day itinerary for ${destination} with these confirmed spots: ${spotsStr}. User sub-interests: ${subsStr}. Travel style: ${styleNote}. Max spots per day: ${tripPace}. ONLY use these confirmed spots: ${includedNames}. NEVER include these excluded spots under any circumstances: ${excludedStr||"none"}.
 
 Rules:
+- USE ONLY the confirmed spots listed above. Do NOT add any other spots not in the list.
+- NEVER add filler spots. NEVER suggest extra places. The confirmed list is final.
+- NEVER include any excluded spots under any circumstances.
+- Each spot must appear EXACTLY ONCE across the entire itinerary — no duplicates.
 - NEVER exceed ${tripPace} spots per day total across all slots
-- NEVER include excluded spots listed above under any circumstances
-- Time-of-day placement is critical: sunset spots (cliffs, viewpoints, beaches) MUST go in evening; sunrise spots MUST go in morning; nightlife/bars/clubs MUST go in evening; breakfast/coffee/brunch MUST go in morning; lunch/street food in afternoon; dinner in evening
+- Time-of-day placement: sunset/viewpoints → evening; nightlife/bars → evening; coffee/brunch → morning; lunch → afternoon; dinner → evening; nature/museums → morning or afternoon
 - Add realistic ~15-30 min driving buffer between spots in same day
-- Group geographically close spots on the same day to minimize total driving
-- Spread spots across all ${numDays} days evenly
-- Add AI-suggested filler spots only if needed to reach ${tripPace} spots per day
+- Group nearby spots on the same day to minimize driving
+- Spread spots across all ${numDays} days as evenly as possible
 - Each spot needs: a short 1-sentence tip, estimated visit duration in minutes, and approx drive time from previous spot in minutes (driveFromPrev, 0 for first spot of day)
 
 Return ONLY valid JSON no markdown:
@@ -1322,7 +1339,6 @@ isNew=true means AI-suggested. duration is minutes. driveFromPrev is driving min
     try{
       itinerary=JSON.parse(rawText);
     }catch(pe){
-      // Response may have been truncated — try to salvage complete days
       const lastClose=rawText.lastIndexOf("}]}");
       if(lastClose>0){
         try{itinerary=JSON.parse(rawText.slice(0,lastClose+3));}
@@ -1331,6 +1347,8 @@ isNew=true means AI-suggested. duration is minutes. driveFromPrev is driving min
         throw new Error("AI response was cut off. Try reducing spots per day.");
       }
     }
+    // Post-process: remove duplicates and excluded spots client-side
+    itinerary=deduplicateItinerary(itinerary, includedNames, excludedStr);
     clearInterval(itinInterval);renderItinerary();
   }catch(err){
     clearInterval(itinInterval);
@@ -1385,6 +1403,40 @@ function buildSlotHtml(items,slotName,dotClass,di){
 }
 
 var itinCounter=1;
+
+function deduplicateItinerary(itin, includedNamesStr, excludedStr){
+  if(!itin||!itin.days)return itin;
+  const seenNames=new Set();
+  const excludedList=(excludedStr||"").toLowerCase().split(",").map(function(s){return s.trim();}).filter(Boolean);
+  const includedList=includedNamesStr.toLowerCase().split(",").map(function(s){return s.trim();}).filter(Boolean);
+
+  itin.days=itin.days.map(function(day){
+    function cleanSlot(items){
+      if(!items)return[];
+      return items.filter(function(item){
+        if(!item||!item.name)return false;
+        const nameLower=item.name.toLowerCase().trim();
+        // Remove if excluded
+        const isExcluded=excludedList.some(function(ex){return ex&&nameLower.includes(ex);});
+        if(isExcluded)return false;
+        // Remove duplicates
+        if(seenNames.has(nameLower))return false;
+        seenNames.add(nameLower);
+        return true;
+      });
+    }
+    day.morning=cleanSlot(day.morning);
+    day.afternoon=cleanSlot(day.afternoon);
+    day.evening=cleanSlot(day.evening);
+    return day;
+  });
+  // Remove empty days
+  itin.days=itin.days.filter(function(day){
+    return(day.morning&&day.morning.length)||(day.afternoon&&day.afternoon.length)||(day.evening&&day.evening.length);
+  });
+  return itin;
+}
+
 function renderItinerary(){
   document.getElementById("itinLoadingView").style.display="none";
   const rv=document.getElementById("itinResultView");
@@ -1431,6 +1483,10 @@ function renderItinerary(){
     +'<p style="font-size:12px;color:var(--gray-400);margin-bottom:1rem">Drag any stop to reorder within its slot. Times shown are average visit durations.</p>';
   rv.appendChild(planHdr);
 
+  const daysGrid=document.createElement("div");
+  daysGrid.className="days-grid";
+  rv.appendChild(daysGrid);
+
   days.forEach(function(day,di){
     const d=new Date(day.date+"T00:00:00");
     const label=d.toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric"});
@@ -1445,7 +1501,7 @@ function renderItinerary(){
       +buildSlotHtml(day.morning,"Morning","morning",di)
       +buildSlotHtml(day.afternoon,"Afternoon","afternoon",di)
       +buildSlotHtml(day.evening,"Evening","evening",di);
-    rv.appendChild(block);
+    daysGrid.appendChild(block);
   });
 
   // ── Note ──
@@ -1533,19 +1589,50 @@ function initDragDrop(){
   });
 }
 
+function saveLastSearch(){
+  if(!destination)return;
+  try{
+    const search={flyingFrom,destination,dateFrom,dateTo,selInterests};
+    localStorage.setItem("voya_last_search",JSON.stringify(search));
+  }catch(e){}
+}
+
+function restoreLastSearch(){
+  try{
+    const saved=localStorage.getItem("voya_last_search");
+    if(!saved)return;
+    const s=JSON.parse(saved);
+    if(s.flyingFrom)document.getElementById("flyingFrom").value=s.flyingFrom;
+    if(s.destination)document.getElementById("dest").value=s.destination;
+    if(s.dateFrom)document.getElementById("dateFrom").value=s.dateFrom;
+    if(s.dateTo)document.getElementById("dateTo").value=s.dateTo;
+    if(s.selInterests&&s.selInterests.length){
+      selInterests=s.selInterests;
+      selInterests.forEach(function(id){
+        const card=document.getElementById("card-"+id);
+        if(card)card.classList.add("selected");
+      });
+    }
+    validateStep0();
+  }catch(e){}
+}
+
 function restart(){
-  track('trip_restarted', {previous_destination: destination});
+  track("trip_restarted",{previous_destination:destination});
+  saveLastSearch();
   flyingFrom="";destination="";dateFrom="";dateTo="";selInterests=[];result=null;selSubs=[];confirmedSpots=[];itinerary=null;customSpots=[];
   tripPace=4;travelStyle="both";
   if(document.getElementById("paceNum"))document.getElementById("paceNum").textContent="4";
-  ["tourist","local","both"].forEach(id=>{const el=document.getElementById("style-"+id);if(el)el.className="style-btn"+(id==="both"?" style-btn-active":"");});
-  ["step2","m2stepA","m2stepB","m2stepC"].forEach(id=>document.getElementById(id).style.display="none");
+  ["tourist","local","both"].forEach(function(id){const el=document.getElementById("style-"+id);if(el)el.className="style-btn"+(id==="both"?" style-btn-active":"");});
+  ["step2","m2stepA","m2stepB","m2stepC"].forEach(function(id){document.getElementById(id).style.display="none";});
   document.getElementById("step0").style.display="block";
-  ["flyingFrom","dest","dateFrom","dateTo"].forEach(id=>document.getElementById(id).value="");
+  ["flyingFrom","dest","dateFrom","dateTo"].forEach(function(id){document.getElementById(id).value="";});
   document.getElementById("btnNext0").disabled=true;
-  M1_INTERESTS.forEach(i=>document.getElementById("card-"+i.id)?.classList.remove("selected"));
-  SUB_INTERESTS.forEach(cat=>cat.items.forEach(item=>document.getElementById("sub-"+item.id)?.classList.remove("selected")));
+  M1_INTERESTS.forEach(function(i){document.getElementById("card-"+i.id)?.classList.remove("selected");});
+  SUB_INTERESTS.forEach(function(cat){cat.items.forEach(function(item){document.getElementById("sub-"+item.id)?.classList.remove("selected");});});
   selInterests=[];selSubs=[];
+  // Restore last search so user doesn't start from scratch
+  setTimeout(restoreLastSearch, 50);
 }
 </script>
 </body>
