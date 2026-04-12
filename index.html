@@ -1440,10 +1440,13 @@ function buildSlotHtml(items,slotName,dotClass,di){
 var itinCounter=1;
 
 function deduplicateItinerary(itin, includedNamesStr, excludedStr){
-  if(!itin||!itin.days)return itin;
+  if(!itin||!itin.days||!itin.days.length)return itin;
   const seenNames=new Set();
-  const excludedList=(excludedStr||"").toLowerCase().split(",").map(function(s){return s.trim();}).filter(Boolean);
-  const includedList=includedNamesStr.toLowerCase().split(",").map(function(s){return s.trim();}).filter(Boolean);
+  // Only build excluded list if there are actual excluded spots
+  const rawExcluded=(excludedStr||"").toLowerCase().trim();
+  const excludedList=rawExcluded&&rawExcluded!=="none"
+    ? rawExcluded.split(",").map(function(s){return s.trim();}).filter(function(s){return s.length>3;})
+    : [];
 
   itin.days=itin.days.map(function(day){
     function cleanSlot(items){
@@ -1451,10 +1454,12 @@ function deduplicateItinerary(itin, includedNamesStr, excludedStr){
       return items.filter(function(item){
         if(!item||!item.name)return false;
         const nameLower=item.name.toLowerCase().trim();
-        // Remove if excluded
-        const isExcluded=excludedList.some(function(ex){return ex&&nameLower.includes(ex);});
+        // Exact match exclusion only — avoid partial false positives
+        const isExcluded=excludedList.some(function(ex){
+          return nameLower===ex||nameLower.startsWith(ex);
+        });
         if(isExcluded)return false;
-        // Remove duplicates
+        // Remove exact duplicates only
         if(seenNames.has(nameLower))return false;
         seenNames.add(nameLower);
         return true;
@@ -1465,10 +1470,15 @@ function deduplicateItinerary(itin, includedNamesStr, excludedStr){
     day.evening=cleanSlot(day.evening);
     return day;
   });
-  // Remove empty days
+  // Only remove days that are truly empty across ALL slots
   itin.days=itin.days.filter(function(day){
     return(day.morning&&day.morning.length)||(day.afternoon&&day.afternoon.length)||(day.evening&&day.evening.length);
   });
+  // Safety: if dedup wiped everything, return original
+  if(!itin.days.length){
+    console.warn("Dedup removed all days — returning original");
+    return JSON.parse(JSON.stringify(itin));
+  }
   return itin;
 }
 
