@@ -216,10 +216,6 @@
     .style-btn svg{color:var(--gray-400);margin:0 auto;display:block}
     .itin-item{cursor:grab;transition:border-color .15s,opacity .15s;position:relative}
     .share-btn{display:flex;align-items:center;gap:10px;padding:14px 16px;background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-lg);text-decoration:none;transition:border-color .15s}
-    .community-photos{display:flex;gap:6px;margin-top:8px;overflow-x:auto;padding-bottom:2px}
-    .community-photo{width:54px;height:54px;border-radius:var(--radius-sm);object-fit:cover;flex-shrink:0;border:1px solid var(--gray-200)}
-    .upload-photo-btn{width:54px;height:54px;border-radius:var(--radius-sm);border:1.5px dashed var(--gray-200);background:var(--gray-50);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:var(--gray-400);font-size:20px;transition:border-color .15s}
-    .upload-photo-btn:hover{border-color:var(--blue-600);color:var(--blue-600)}
     .share-wa:hover{border-color:#25D366}
     .share-email:hover{border-color:var(--blue-600)}
     .share-ico{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -292,8 +288,8 @@
         <div class="lh-row"><span class="lh-key">Password</span><span class="lh-val">passport123</span></div>
         <div style="font-size:11px;color:var(--gray-400);margin-top:6px;font-style:italic">We don't judge. We've also forgotten sunscreen in Bali.</div>
       </div>
-      <div class="field"><label>Username</label><input type="text" id="loginUser" placeholder="SunscreenForgetter99" autocomplete="off"/></div>
-      <div class="field"><label>Password</label><input type="password" id="loginPass" placeholder="passport123"/></div>
+      <div class="field"><label>Username</label><input type="text" id="loginUser" placeholder="" autocomplete="off"/></div>
+      <div class="field"><label>Password</label><input type="password" id="loginPass" placeholder=""/></div>
       <button class="btn-primary" onclick="doLogin()">Let me in &rarr;</button>
       <div class="login-error" id="loginError">That's not it — the sunscreen doesn't lie though, check above!</div>
     </div>
@@ -416,7 +412,16 @@
       <h1 class="heading">Confirm your spots</h1>
       <p class="subtext">These are your AI-suggested spots. Uncheck any you'd like to skip — we'll build your schedule around what's left.</p>
       <div id="confirmList"></div>
-      <button class="btn-primary" onclick="buildItinerary()">Generate itinerary &rarr;</button>
+      <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--gray-100)">
+        <div style="font-size:13px;font-weight:500;color:var(--gray-900);margin-bottom:8px">Add your own spot</div>
+        <div style="font-size:12px;color:var(--gray-400);margin-bottom:10px">Know a place you want to visit that's not listed? Add it here.</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="text" id="customSpotInput" placeholder="e.g. Balboa Park, San Diego" style="flex:1;font-size:14px;padding:9px 12px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);background:var(--gray-50);outline:none"/>
+          <button onclick="addCustomSpot()" style="padding:9px 16px;background:var(--blue-600);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap">Add</button>
+        </div>
+        <div id="customSpotsList" style="margin-top:10px"></div>
+      </div>
+      <button class="btn-primary" style="margin-top:1rem" onclick="buildItinerary()">Generate itinerary &rarr;</button>
     </div>
 
     <!-- M2: Step C - Itinerary -->
@@ -982,11 +987,13 @@ async function loadSpotPhotos(spots){
     const imgEl=document.getElementById("simg-"+i);
     const attrEl=document.getElementById("sattr-"+i);
     if(!imgEl)continue;
+    const destCity=destination.split(",")[0].trim();
     const queries=[
-      `${s.name} ${destination}`,
+      `${s.name} ${destCity}`,
+      `${s.name} ${destCity} ${s.imgQ||""}`.trim(),
+      `${s.imgQ||s.name} ${destCity}`,
       `${s.name}`,
-      `${destination} ${s.imgQ||s.type}`,
-      destination
+      destCity
     ];
     let loaded=false;
     for(const q of queries){
@@ -1013,6 +1020,30 @@ async function loadSpotPhotos(spots){
   }
 }
 
+const CURRENCY_RATES={"USD":1,"INR":83.5,"EUR":0.92,"GBP":0.79,"AUD":1.53,"CAD":1.36,"SGD":1.34,"AED":3.67,"JPY":149.5,"MXN":17.2};
+const CURRENCY_SYMBOLS={"USD":"$","INR":"₹","EUR":"€","GBP":"£","AUD":"A$","CAD":"C$","SGD":"S$","AED":"د.إ","JPY":"¥","MXN":"$"};
+let selectedCurrency="USD";
+
+function updateCurrency(){
+  const sel=document.getElementById("currencySelect");
+  if(!sel)return;
+  selectedCurrency=sel.value;
+  const sym=CURRENCY_SYMBOLS[selectedCurrency];
+  const rate=CURRENCY_RATES[selectedCurrency];
+  const note=document.getElementById("currencyNote");
+  if(note){
+    if(selectedCurrency==="USD"){note.textContent="";}
+    else{note.textContent="~"+sym+(rate*50).toFixed(0)+"–"+sym+(rate*150).toFixed(0)+" typical daily budget";}
+  }
+}
+
+function convertPrice(usdAmount){
+  const rate=CURRENCY_RATES[selectedCurrency]||1;
+  const sym=CURRENCY_SYMBOLS[selectedCurrency]||"$";
+  const converted=Math.round(usdAmount*rate);
+  return sym+converted.toLocaleString();
+}
+
 function renderResults(){
   document.getElementById("loadingView").style.display="none";
   const rv=document.getElementById("resultsView");rv.style.display="block";
@@ -1029,6 +1060,22 @@ function renderResults(){
         <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="3" fill="#185FA5"/><circle cx="6.5" cy="1" r="1.2" fill="#185FA5"/><circle cx="6.5" cy="12" r="1.2" fill="#185FA5"/><circle cx="1" cy="6.5" r="1.2" fill="#185FA5"/><circle cx="12" cy="6.5" r="1.2" fill="#185FA5"/><circle cx="2.8" cy="2.8" r="1" fill="#185FA5"/><circle cx="10.2" cy="2.8" r="1" fill="#185FA5"/><circle cx="2.8" cy="10.2" r="1" fill="#185FA5"/><circle cx="10.2" cy="10.2" r="1" fill="#185FA5"/></svg>
         ${result.weather} &middot; ${result.temp}
       </div>
+    </div>
+    <div style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <span style="font-size:12px;color:var(--blue-600)">Show prices in</span>
+      <select id="currencySelect" onchange="updateCurrency()" style="font-size:12px;padding:3px 8px;border:1px solid var(--blue-100);border-radius:20px;background:var(--blue-50);color:var(--blue-800);outline:none;cursor:pointer">
+        <option value="USD">🇺🇸 USD $</option>
+        <option value="INR">🇮🇳 INR ₹</option>
+        <option value="EUR">🇪🇺 EUR €</option>
+        <option value="GBP">🇬🇧 GBP £</option>
+        <option value="AUD">🇦🇺 AUD A$</option>
+        <option value="CAD">🇨🇦 CAD C$</option>
+        <option value="SGD">🇸🇬 SGD S$</option>
+        <option value="AED">🇦🇪 AED د.إ</option>
+        <option value="JPY">🇯🇵 JPY ¥</option>
+        <option value="MXN">🇲🇽 MXN $</option>
+      </select>
+      <span id="currencyNote" style="font-size:11px;color:var(--gray-400);font-style:italic"></span>
     </div>
     <div class="section-label">What to pack</div>
     <div class="chip-wrap">${(result.packing||[]).map(p=>`<span class="chip">${p}</span>`).join("")}</div>
@@ -1050,6 +1097,16 @@ function renderResults(){
           </div>
           <div class="spot-desc">${s.desc}</div>
           ${s.photoTip?`<div class="photo-tip">${s.photoTip}</div>`:""}
+          <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+            <a href="https://www.google.com/maps/search/${encodeURIComponent(s.name+', '+destination)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--blue-600);text-decoration:none;background:var(--blue-50);border:1px solid var(--blue-100);border-radius:20px;padding:4px 11px">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              Google Maps
+            </a>
+            <a href="https://www.instagram.com/explore/tags/${encodeURIComponent(s.name.replace(/[\s'&]/g,'').toLowerCase()+destination.split(',')[0].replace(/\s/g,'').toLowerCase())}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#C13584;text-decoration:none;background:#FDF3F8;border:1px solid #F4C0D1;border-radius:20px;padding:4px 11px">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+              Instagram
+            </a>
+          </div>
         </div>
       </div>`).join("")}
     ${result.contentTip?`<div class="info-box"><div class="info-label">Content creator tip</div><div class="info-text">${result.contentTip}</div></div>`:""}
@@ -1093,42 +1150,6 @@ function goToM2Confirm(){
   renderConfirmList();
 }
 
-function getCommunityPhotos(spotName){
-  const key="voya_photos_"+spotName.toLowerCase().replace(/\s+/g,"_");
-  try{
-    const photos=JSON.parse(localStorage.getItem(key)||"[]");
-    return photos.map(function(src){
-      return '<img class="community-photo" src="'+src+'" title="Community photo" />';
-    }).join("");
-  }catch(e){return "";}
-}
-
-function triggerPhotoUpload(idx, spotName){
-  document.getElementById("file-"+idx).click();
-}
-
-function handlePhotoUpload(event, idx, spotName){
-  const file=event.target.files[0];
-  if(!file)return;
-  const reader=new FileReader();
-  reader.onload=function(e){
-    const src=e.target.result;
-    const key="voya_photos_"+spotName.toLowerCase().replace(/\s+/g,"_");
-    try{
-      const photos=JSON.parse(localStorage.getItem(key)||"[]");
-      photos.unshift(src);
-      localStorage.setItem(key, JSON.stringify(photos.slice(0,5)));
-      const container=document.getElementById("cphoto-"+idx);
-      if(container){
-        const img=document.createElement("img");
-        img.className="community-photo";img.src=src;img.title="Your photo";
-        container.insertBefore(img, container.firstChild);
-      }
-    }catch(ex){console.error(ex);}
-  };
-  reader.readAsDataURL(file);
-}
-
 function renderConfirmList(){
   const el=document.getElementById("confirmList");
   el.innerHTML=confirmedSpots.map((s,i)=>{
@@ -1150,11 +1171,7 @@ function renderConfirmList(){
           <a href="${mapsUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--blue-600);text-decoration:none;background:var(--blue-50);border:1px solid var(--blue-100);border-radius:20px;padding:3px 10px">${mapIco} Google Maps</a>
           <a href="${igUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#C13584;text-decoration:none;background:#FDF3F8;border:1px solid #F4C0D1;border-radius:20px;padding:3px 10px">${igIco} Instagram</a>
         </div>
-        <div class="community-photos" id="cphoto-${i}">
-          ${getCommunityPhotos(s.name)}
-          <div class="upload-photo-btn" onclick="triggerPhotoUpload(${i},'${s.name.replace(/'/g,'')}')" title="Add your photo">+</div>
-        </div>
-        <input type="file" id="file-${i}" accept="image/*" style="display:none" onchange="handlePhotoUpload(event,${i},'${s.name.replace(/'/g,'')}')"/>
+
       </div>
     </div>`;
   }).join("");
@@ -1166,8 +1183,46 @@ function toggleSpot(i){
 }
 
 /* ── BUILD ITINERARY ── */
+let customSpots=[];
+
+function addCustomSpot(){
+  const input=document.getElementById("customSpotInput");
+  const val=input.value.trim();
+  if(!val)return;
+  const spot={name:val,type:"experience",tag:"custom",desc:"Added by you",score:8,mustVisit:false,confirmed:true,neighborhood:destination.split(",")[0],isCustom:true};
+  customSpots.push(spot);
+  input.value="";
+  renderCustomSpots();
+}
+
+function removeCustomSpot(idx){
+  customSpots.splice(idx,1);
+  renderCustomSpots();
+}
+
+function renderCustomSpots(){
+  const el=document.getElementById("customSpotsList");
+  if(!el)return;
+  const mapIco='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
+  const igIco='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>';
+  el.innerHTML=customSpots.map(function(s,i){
+    const mapsLink="https://www.google.com/maps/search/"+encodeURIComponent(s.name+", "+destination);
+    const igLink="https://www.instagram.com/explore/tags/"+encodeURIComponent(s.name.replace(/[\s'&]/g,"").toLowerCase()+destination.split(",")[0].replace(/\s/g,"").toLowerCase())+"/";
+    return '<div style="background:var(--teal-50);border:1px solid var(--teal-100);border-radius:var(--radius-md);padding:.7rem .9rem;margin-bottom:6px;display:flex;align-items:flex-start;gap:10px">'
+      +'<div style="flex:1">'
+      +'<div style="font-size:14px;font-weight:500;color:var(--teal-800);margin-bottom:4px">'+s.name+'</div>'
+      +'<div style="display:flex;gap:6px">'
+      +'<a href="'+mapsLink+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:3px;font-size:10px;color:var(--blue-600);text-decoration:none;background:var(--blue-50);border:1px solid var(--blue-100);border-radius:20px;padding:2px 8px">'+mapIco+' Maps</a>'
+      +'<a href="'+igLink+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:3px;font-size:10px;color:#C13584;text-decoration:none;background:#FDF3F8;border:1px solid #F4C0D1;border-radius:20px;padding:2px 8px">'+igIco+' Instagram</a>'
+      +'</div>'
+      +'</div>'
+      +'<button onclick="removeCustomSpot('+i+')" style="background:none;border:none;cursor:pointer;font-size:16px;color:var(--gray-400);padding:0;line-height:1">&times;</button>'
+      +'</div>';
+  }).join("");
+}
+
 async function buildItinerary(){
-  const kept=confirmedSpots.filter(s=>s.confirmed);
+  const kept=[...confirmedSpots.filter(s=>s.confirmed),...customSpots];
   if(kept.length<2){alert("Please keep at least 2 spots for a meaningful itinerary!");return;}
   document.getElementById("m2stepB").style.display="none";
   document.getElementById("m2stepC").style.display="block";
@@ -1416,7 +1471,7 @@ function initDragDrop(){
 
 function restart(){
   track('trip_restarted', {previous_destination: destination});
-  flyingFrom="";destination="";dateFrom="";dateTo="";selInterests=[];result=null;selSubs=[];confirmedSpots=[];itinerary=null;
+  flyingFrom="";destination="";dateFrom="";dateTo="";selInterests=[];result=null;selSubs=[];confirmedSpots=[];itinerary=null;customSpots=[];
   tripPace=4;travelStyle="both";
   if(document.getElementById("paceNum"))document.getElementById("paceNum").textContent="4";
   ["tourist","local","both"].forEach(id=>{const el=document.getElementById("style-"+id);if(el)el.className="style-btn"+(id==="both"?" style-btn-active":"");});
