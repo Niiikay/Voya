@@ -415,9 +415,12 @@
       <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--gray-100)">
         <div style="font-size:13px;font-weight:500;color:var(--gray-900);margin-bottom:8px">Add your own spot</div>
         <div style="font-size:12px;color:var(--gray-400);margin-bottom:10px">Know a place you want to visit that's not listed? Add it here.</div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <input type="text" id="customSpotInput" placeholder="e.g. Balboa Park, San Diego" style="flex:1;font-size:14px;padding:9px 12px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);background:var(--gray-50);outline:none"/>
-          <button onclick="addCustomSpot()" style="padding:9px 16px;background:var(--blue-600);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap">Add</button>
+        <div style="position:relative">
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="text" id="customSpotInput" placeholder="e.g. Universal Studios, Los Angeles" autocomplete="off" oninput="customSpotSearch()" onkeydown="customSpotKeydown(event)" style="flex:1;font-size:14px;padding:9px 12px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);background:var(--gray-50);outline:none"/>
+            <button onclick="addCustomSpot()" style="padding:9px 16px;background:var(--blue-600);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap">Add</button>
+          </div>
+          <div id="customSpotDropdown" style="display:none;position:absolute;top:100%;left:0;right:60px;background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-sm);box-shadow:0 4px 12px rgba(0,0,0,.08);z-index:50;margin-top:2px;max-height:200px;overflow-y:auto"></div>
         </div>
         <div id="customSpotsList" style="margin-top:10px"></div>
       </div>
@@ -960,7 +963,7 @@ function renderEvents(events){
     const tc=typeColors[ev.type]||typeColors.experience;
     const card=document.createElement("div");
     card.style.cssText="background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-md);padding:1rem";
-    const priceHtml=ev.price?'<div style="font-size:12px;font-weight:500;color:var(--teal-600);white-space:nowrap">'+ev.price+'</div>':"";
+    const priceHtml=ev.price?'<div style="font-size:12px;font-weight:500;color:var(--teal-600);white-space:nowrap">'+convertEventPrice(ev.price)+'</div>':"";
     const venueHtml=ev.venue?" &middot; "+ev.venue:"";
     card.innerHTML='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px">'
       +'<div style="flex:1">'
@@ -1200,11 +1203,73 @@ function toggleSpot(i){
 /* ── BUILD ITINERARY ── */
 let customSpots=[];
 
+let customDropdownIdx=-1;
+let customSpotTimer=null;
+
+function customSpotSearch(){
+  clearTimeout(customSpotTimer);
+  const input=document.getElementById("customSpotInput");
+  const val=input.value.trim();
+  const dd=document.getElementById("customSpotDropdown");
+  customDropdownIdx=-1;
+  if(val.length<2){dd.style.display="none";return;}
+  customSpotTimer=setTimeout(async function(){
+    // Generate suggestions using AI
+    const destCity=destination.split(",")[0];
+    const suggestions=generateSpotSuggestions(val, destCity);
+    if(!suggestions.length){dd.style.display="none";return;}
+    dd.innerHTML=suggestions.map(function(s,i){
+      const dv=s.replace(/"/g,"&quot;");
+      return '<div class="custom-ac-item" data-val="'+dv+'" onclick="pickCustomSpot(this.dataset.val)" style="padding:9px 14px;font-size:14px;color:var(--gray-900);cursor:pointer;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:8px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> '+s+'</div>';
+    }).join("");
+    dd.style.display="block";
+  }, 200);
+}
+
+function generateSpotSuggestions(query, destCity){
+  // Disambiguate with destination city to avoid wrong location
+  const q=query.toLowerCase();
+  const suggestions=[];
+  // Always suggest with destination city appended for disambiguation
+  suggestions.push(query+", "+destCity);
+  // If user typed a city already, don't add destination
+  if(!query.includes(","))suggestions.push(query+", "+destination);
+  return suggestions.slice(0,5);
+}
+
+function pickCustomSpot(val){
+  document.getElementById("customSpotInput").value=val;
+  document.getElementById("customSpotDropdown").style.display="none";
+  customDropdownIdx=-1;
+}
+
+function customSpotKeydown(e){
+  const dd=document.getElementById("customSpotDropdown");
+  const items=dd.querySelectorAll(".custom-ac-item");
+  if(dd.style.display==="none"||!items.length)return;
+  if(e.key==="ArrowDown"){e.preventDefault();customDropdownIdx=Math.min(customDropdownIdx+1,items.length-1);highlightCustom(items);}
+  else if(e.key==="ArrowUp"){e.preventDefault();customDropdownIdx=Math.max(customDropdownIdx-1,0);highlightCustom(items);}
+  else if(e.key==="Enter"&&customDropdownIdx>=0){e.preventDefault();pickCustomSpot(items[customDropdownIdx].dataset.val);}
+  else if(e.key==="Escape"){dd.style.display="none";}
+}
+
+function highlightCustom(items){
+  items.forEach(function(el,i){el.style.background=i===customDropdownIdx?"var(--blue-50)":"";});
+  if(items[customDropdownIdx])items[customDropdownIdx].scrollIntoView({block:"nearest"});
+}
+
+document.addEventListener("click",function(e){
+  const dd=document.getElementById("customSpotDropdown");
+  const input=document.getElementById("customSpotInput");
+  if(dd&&input&&!dd.contains(e.target)&&e.target!==input)dd.style.display="none";
+});
+
 function addCustomSpot(){
   const input=document.getElementById("customSpotInput");
   const val=input.value.trim();
   if(!val)return;
-  const spot={name:val,type:"experience",tag:"custom",desc:"Added by you",score:8,mustVisit:false,confirmed:true,neighborhood:destination.split(",")[0],isCustom:true};
+  document.getElementById("customSpotDropdown").style.display="none";
+  const spot={name:val,type:"experience",tag:"custom",desc:"Added by you",score:8,mustVisit:false,confirmed:true,neighborhood:val.includes(",")? val.split(",").slice(-1)[0].trim() : destination.split(",")[0],isCustom:true};
   customSpots.push(spot);
   input.value="";
   renderCustomSpots();
@@ -1414,13 +1479,14 @@ function renderItinerary(){
   const shareText=buildShareText();
   const waUrl="https://wa.me/?text="+encodeURIComponent(shareText);
   // Tracking handled via onclick on the anchor
-  const mailUrl="mailto:?subject="+encodeURIComponent("VOYA Itinerary — "+destination)+"&body="+buildEmailTable();
+  // mailto has ~2000 char limit — use plain text not table
+  const mailBody=buildShareText().slice(0,1800);
+  const mailUrl="mailto:?subject="+encodeURIComponent("VOYA Itinerary — "+destination)+"&body="+encodeURIComponent(mailBody);
   const share=document.createElement("div");
   share.style.cssText="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--gray-100)";
   share.innerHTML=
     '<div style="font-family:var(--font-display);font-size:22px;font-weight:400;color:var(--gray-900);margin-bottom:6px">Share your itinerary</div>'
     +'<div style="font-size:13px;color:var(--gray-400);margin-bottom:1.25rem">Send this plan to a travel buddy or save it for later</div>'
-    +'<div style="font-size:13px;color:var(--gray-400);margin-bottom:1.25rem">Send this plan to a travel buddy or save it for yourself</div>'
     +'<div class="share-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
     +'<a href="'+waUrl+'" target="_blank" rel="noopener" class="share-btn share-wa" onclick="track(&quot;itinerary_shared&quot;,{method:&quot;whatsapp&quot;,destination:destination})">'
     +'<div class="share-ico share-ico-wa">'
