@@ -916,14 +916,15 @@ async function analyze(){
   const interests=selInterests.length?selInterests.join(", "):"general travel";
   const prompt=`Travel AI for VOYA. User flying from ${flyingFrom} to ${destination}. Arrives ${dateFrom}, departs ${dateTo}. Interests: ${interests}.
 Return ONLY valid JSON no markdown:
-{"vibe":"2-sentence description of ${destination} this season","weather":"brief historical weather","temp":"temp range like 68-82F","packing":["6-8 packing items"],"outfitNote":"one sentence outfit note","spots":[{"name":"Place","type":"food|nightlife|nature|culture|shopping|adventure|photography|experience","tag":"one word","desc":"2 sentences why special","score":9,"mustVisit":true,"photoTip":"specific photo tip","imgQ":"2-3 word image search","neighborhood":"area or neighborhood name"},...12 total spots...],"contentTip":"best content creator tip","eventsNote":"seasonal events to look for"}
-Include exactly 12 spots scored 1-10 (8+ is must-go). Be specific and local. Vary types based on interests.`;
+{"vibe":"2-sentence description of ${destination} this season","weather":"brief historical weather","temp":"temp range like 68-82F","packing":["6-8 packing items"],"outfitNote":"one sentence outfit note","spots":[{"name":"Place","type":"food|nightlife|nature|culture|shopping|adventure|photography|experience","tag":"one word","desc":"2 sentences why special","score":9,"mustVisit":true,"photoTip":"specific photo tip","imgQ":"2-3 word image search","neighborhood":"area or neighborhood name"},...spots based on days × pace + 2...],"contentTip":"best content creator tip","eventsNote":"seasonal events to look for"}
+Include exactly ${Math.min(numDays*tripPace+2,20)} spots scored 1-10 (8+ is must-go). Be specific and local. Vary types based on interests.`;
   try{
     const r=await fetch("https://api.groq.com/openai/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":`Bearer ${getKey()}`},body:JSON.stringify({model:"llama-3.3-70b-versatile",messages:[{role:"user",content:prompt}],temperature:.7,max_tokens:1800})});
     const d=await r.json();if(d.error)throw new Error(d.error.message);
     result=JSON.parse(d.choices[0].message.content.replace(/```json|```/g,"").trim());
     clearInterval(loadingInterval);renderResults();
     setTimeout(()=>loadSpotPhotos(result.spots||[]),400);
+    setTimeout(()=>loadOpeningHours(result.spots||[]),800);
     setTimeout(()=>loadEvents(),600);
   }catch(err){
     clearInterval(loadingInterval);
@@ -999,16 +1000,56 @@ function renderEvents(events){
     card.style.cssText="background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-md);padding:1rem";
     const priceHtml=ev.price?'<div style="font-size:12px;font-weight:500;color:var(--teal-600);white-space:nowrap">'+convertEventPrice(ev.price)+'</div>':"";
     const venueHtml=ev.venue?" &middot; "+ev.venue:"";
+    const destCity2=destination.split(",")[0].trim();
+    const eventSearch=encodeURIComponent(ev.name+" "+destCity2);
+    const ebUrl="https://www.eventbrite.com/d/"+encodeURIComponent(destCity2.toLowerCase())+"/"+eventSearch;
+    const shUrl="https://www.stubhub.com/find/s/?q="+eventSearch;
+    const googleEvUrl="https://www.google.com/search?q="+eventSearch+"+tickets";
+    const ticketLinks=ev.type==="sports"||ev.type==="concert"
+      ?'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">'
+        +'<a href="'+shUrl+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#fff;background:#185FA5;border-radius:var(--radius-sm);padding:4px 10px;text-decoration:none;font-weight:500">Tickets on StubHub</a>'
+        +'<a href="'+ebUrl+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#F05537;background:#FEF0ED;border:1px solid #F9C4B3;border-radius:var(--radius-sm);padding:4px 10px;text-decoration:none;font-weight:500">Eventbrite</a>'
+        +'</div>'
+      :'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">'
+        +'<a href="'+ebUrl+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#F05537;background:#FEF0ED;border:1px solid #F9C4B3;border-radius:var(--radius-sm);padding:4px 10px;text-decoration:none;font-weight:500">Find on Eventbrite</a>'
+        +'<a href="'+googleEvUrl+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--blue-600);background:var(--blue-50);border:1px solid var(--blue-100);border-radius:var(--radius-sm);padding:4px 10px;text-decoration:none;font-weight:500">Search tickets</a>'
+        +'</div>';
     card.innerHTML='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px">'
       +'<div style="flex:1">'
       +'<span style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;'+tc+';border:1px solid;border-radius:4px;padding:2px 7px;display:inline-block;margin-bottom:5px">'+ev.type+'</span>'
       +'<div style="font-size:15px;font-weight:500;color:var(--gray-900)">'+ev.name+'</div>'
       +'</div>'+priceHtml+'</div>'
       +'<div style="font-size:12px;color:var(--gray-400);margin-bottom:4px">'+ev.date+venueHtml+'</div>'
-      +'<div style="font-size:13px;color:var(--gray-600);line-height:1.5">'+ev.desc+'</div>';
+      +'<div style="font-size:13px;color:var(--gray-600);line-height:1.5;margin-bottom:4px">'+ev.desc+'</div>'
+      +ticketLinks;
     evList.appendChild(card);
   });
   evEl.appendChild(evList);
+}
+
+async function loadOpeningHours(spots){
+  if(!window.google||!google.maps||!google.maps.places)return;
+  const destCity=destination.split(",")[0].trim();
+  for(let i=0;i<spots.length;i++){
+    const s=spots[i];
+    const el=document.getElementById("hours-"+i);
+    if(!el)continue;
+    try{
+      const hours=await fetchOpeningHours(s.name, destCity);
+      if(hours){
+        const isOpenNow=hours.isOpen?hours.isOpen():null;
+        const weekday=hours.weekday_text;
+        const today=new Date().toLocaleDateString("en-US",{weekday:"long"});
+        const todayHours=weekday?weekday.find(function(h){return h.startsWith(today);}):null;
+        if(todayHours){
+          const hoursStr=todayHours.replace(today+": ","");
+          el.innerHTML="<svg width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round'><circle cx='12' cy='12' r='10'/><polyline points='12 6 12 12 16 14'/></svg> "+hoursStr
+            +(isOpenNow===true?" &middot; <span style='color:var(--teal-600)'>Open now</span>":isOpenNow===false?" &middot; <span style='color:#C62828'>Closed now</span>":"");
+        }
+      }
+    }catch(e){}
+    await new Promise(function(r){setTimeout(r,150);});
+  }
 }
 
 async function loadSpotPhotos(spots){
@@ -1096,6 +1137,51 @@ function convertEventPrice(priceStr){
   return sym+converted.join("–");
 }
 
+async function fetchOpeningHours(spotName, destCity){
+  // Use Places Text Search to find place and get opening hours
+  return new Promise(function(resolve){
+    if(!window.google||!google.maps||!google.maps.places){resolve(null);return;}
+    try{
+      const service=new google.maps.places.PlacesService(document.createElement("div"));
+      service.textSearch({
+        query:spotName+" "+destCity,
+        fields:["opening_hours","name"]
+      },function(results,status){
+        if(status===google.maps.places.PlacesServiceStatus.OK&&results&&results[0]){
+          const place=results[0];
+          if(place.opening_hours&&place.opening_hours.periods){
+            resolve(place.opening_hours);
+          }else{
+            resolve(null);
+          }
+        }else{
+          resolve(null);
+        }
+      });
+    }catch(e){resolve(null);}
+  });
+}
+
+function getOpeningTimeCategory(openingHours){
+  // Returns "morning", "afternoon", "evening", or null
+  if(!openingHours||!openingHours.periods)return null;
+  const today=new Date().getDay(); // 0=Sun
+  const todayPeriods=openingHours.periods.filter(function(p){return p.open&&(p.open.day===today||openingHours.periods.length===1);});
+  if(!todayPeriods.length&&openingHours.periods[0]){
+    // Use first available period
+    todayPeriods.push(openingHours.periods[0]);
+  }
+  if(!todayPeriods.length)return null;
+  const openHour=todayPeriods[0].open?parseInt(todayPeriods[0].open.time.slice(0,2)):null;
+  const closeHour=todayPeriods[0].close?parseInt(todayPeriods[0].close.time.slice(0,2)):null;
+  if(openHour===null)return null;
+  // Classify by opening time
+  if(openHour>=5&&openHour<11)return"morning";
+  if(openHour>=11&&openHour<16)return"afternoon";
+  if(openHour>=16||openHour<5)return"evening";
+  return null;
+}
+
 function renderResults(){
   document.getElementById("loadingView").style.display="none";
   const rv=document.getElementById("resultsView");rv.style.display="block";
@@ -1150,6 +1236,7 @@ function renderResults(){
           </div>
           <div class="spot-desc">${s.desc}</div>
           ${s.photoTip?`<div class="photo-tip">${s.photoTip}</div>`:""}
+          <div id="hours-${si}" style="font-size:11px;color:var(--gray-400);margin-top:6px;font-style:italic"></div>
           <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
             <a href="https://www.google.com/maps/search/${encodeURIComponent(s.name+', '+destination)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--blue-600);text-decoration:none;background:var(--blue-50);border:1px solid var(--blue-100);border-radius:20px;padding:4px 11px">
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -1342,7 +1429,7 @@ Rules:
 - NEVER include any excluded spots under any circumstances.
 - Each spot must appear EXACTLY ONCE across the entire itinerary — no duplicates.
 - You MUST include EXACTLY ${tripPace} spots per day total (split across morning, afternoon, evening). Not fewer. Not more. Exactly ${tripPace}.
-- Time-of-day placement: sunset/viewpoints → evening; nightlife/bars → evening; coffee/brunch → morning; lunch → afternoon; dinner → evening; nature/museums → morning or afternoon
+- Time-of-day placement (use real-world knowledge of when places open): sunset/viewpoints → evening; nightlife/bars/clubs → evening only; coffee/brunch/bakeries → morning only; lunch/street food → afternoon; dinner → evening; beaches → morning or afternoon; museums/parks → morning or afternoon; malls/shopping → afternoon
 - Add realistic ~15-30 min driving buffer between spots in same day
 - Group nearby spots on the same day to minimize driving
 - Spread spots across all ${numDays} days as evenly as possible
