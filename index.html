@@ -917,11 +917,11 @@ async function analyze(){
   const m1Days=Math.max(1,Math.round((new Date(dateTo)-new Date(dateFrom))/(1000*60*60*24)));
   const m1SpotCount=Math.min(m1Days*tripPace+2,20);
   const prompt=`Travel AI for VOYA. User flying from ${flyingFrom} to ${destination}. Arrives ${dateFrom}, departs ${dateTo}. Interests: ${interests}.
-Return ONLY valid JSON no markdown:
-{"vibe":"2-sentence description of ${destination} this season","weather":"brief historical weather","temp":"temp range like 68-82F","packing":["6-8 packing items"],"outfitNote":"one sentence outfit note","spots":[{"name":"Place","type":"food|nightlife|nature|culture|shopping|adventure|photography|experience","tag":"one word","desc":"2 sentences why special","score":9,"mustVisit":true,"photoTip":"specific photo tip","imgQ":"2-3 word image search","neighborhood":"area or neighborhood name"}],"contentTip":"best content creator tip","eventsNote":"seasonal events to look for"}
-Include exactly ${m1SpotCount} spots scored 1-10 (8+ is must-go). Be specific and local. Vary types based on interests.`;
+Return ONLY valid JSON, no markdown:
+{"vibe":"1 sentence vibe","weather":"1 sentence weather","temp":"e.g. 68-82F","packing":["item1","item2","item3","item4","item5"],"outfitNote":"1 sentence","spots":[{"name":"str","type":"str","tag":"str","desc":"1 sentence","score":8,"mustVisit":true,"photoTip":"str","imgQ":"2 words","neighborhood":"str"}],"contentTip":"1 sentence","eventsNote":"1 sentence"}
+Include exactly ${m1SpotCount} spots. Score 1-10 (8+ = mustVisit true). Be specific and local.`;
   try{
-    const r=await fetch("https://api.groq.com/openai/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":`Bearer ${getKey()}`},body:JSON.stringify({model:"llama-3.3-70b-versatile",messages:[{role:"user",content:prompt}],temperature:.7,max_tokens:1800})});
+    const r=await fetch("https://api.groq.com/openai/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":`Bearer ${getKey()}`},body:JSON.stringify({model:"llama-3.3-70b-versatile",messages:[{role:"user",content:prompt}],temperature:.7,max_tokens:3500})});
     const d=await r.json();if(d.error)throw new Error(d.error.message);
     result=JSON.parse(d.choices[0].message.content.replace(/```json|```/g,"").trim());
     clearInterval(loadingInterval);renderResults();
