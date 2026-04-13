@@ -22,8 +22,6 @@
   </script>
   <!-- Google Sign-In — replace 622034097373-frmmi1ut22kptfuk9fjdri28l83mnqd8.apps.googleusercontent.com with your OAuth Client ID -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <!-- Google Places API for smart spot search -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHVvTB9icN-pvcopnnx6eyHiNYGPVdX-8&libraries=places" async defer onload="initPlacesAutocomplete()"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <style>
@@ -451,7 +449,7 @@
             <input type="text" id="customSpotInput" placeholder="e.g. Sea World, San Diego" autocomplete="off" style="flex:1;font-size:14px;padding:9px 12px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);background:var(--gray-50);outline:none"/>
             <button onclick="addCustomSpot()" style="padding:9px 16px;background:var(--blue-600);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap">Add</button>
           </div>
-          <div style="font-size:11px;color:var(--gray-400);margin-top:4px">Start typing — full place name with city will appear automatically</div>
+          <div style="font-size:11px;color:var(--gray-400);margin-top:4px">Type the place name and city (e.g. Sea World, San Diego)</div>
         </div>
         <div id="customSpotsList" style="margin-top:10px"></div>
       </div>
@@ -1365,44 +1363,9 @@ function toggleSpot(i){
 /* ── BUILD ITINERARY ── */
 let customSpots=[];
 
-let placesAutocomplete=null;
-let selectedPlaceDetails=null;
 
-function initPlacesAutocomplete(){
-  const input=document.getElementById("customSpotInput");
-  if(!input)return;
-  // Suppress Google Maps error popups
-  window.gm_authFailure=function(){
-    console.warn("Google Maps auth failed — falling back to plain text input");
-  };
-  if(!window.google||!google.maps||!google.maps.places){
-    // Graceful fallback: plain text input still works fine
-    return;
-  }
-  try{
-    placesAutocomplete=new google.maps.places.Autocomplete(input,{
-      types:["establishment","geocode"],
-      fields:["name","formatted_address","geometry","types","url"]
-    });
-    placesAutocomplete.addListener("place_changed",function(){
-      try{
-        const place=placesAutocomplete.getPlace();
-        if(!place||!place.name)return;
-        selectedPlaceDetails=place;
-        if(place.formatted_address){
-          input.value=place.name+", "+place.formatted_address;
-        }
-      }catch(e){}
-    });
-  }catch(e){
-    console.warn("Places autocomplete unavailable:",e.message);
-  }
-}
-
-// Retry init after confirm screen appears (DOM loaded later)
-function ensurePlacesAutocomplete(){
-  if(!placesAutocomplete){initPlacesAutocomplete();}
-}
+// Stub — Places API removed, using plain text input
+function ensurePlacesAutocomplete(){}
 
 function addCustomSpot(){
   const input=document.getElementById("customSpotInput");
