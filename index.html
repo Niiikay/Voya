@@ -945,6 +945,44 @@ Include exactly ${m1SpotCount} spots. Score 1-10 (8+ = mustVisit true). Be speci
 
 function formatDate(d){return new Date(d+"T00:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});}
 
+function addEventToItinerary(btn, name, type, date){
+  // Add event as a custom spot so it flows into the itinerary builder
+  if(!customSpots)window.customSpots=[];
+  // Check not already added
+  const exists=customSpots.some(function(s){return s.name===name;});
+  if(exists){
+    btn.textContent="Already added ✓";
+    btn.style.color="var(--gray-400)";
+    btn.disabled=true;
+    return;
+  }
+  const spot={
+    name:name,
+    type:type==="concert"?"nightlife":type==="sports"?"experience":type==="food"?"food":"experience",
+    tag:type,
+    desc:"Event on "+date,
+    score:8,
+    mustVisit:false,
+    confirmed:true,
+    neighborhood:destination.split(",")[0],
+    isCustom:true,
+    isEvent:true,
+    eventDate:date
+  };
+  customSpots.push(spot);
+  btn.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Added to itinerary!';
+  btn.style.color="var(--teal-600)";
+  btn.style.background="var(--teal-50)";
+  btn.disabled=true;
+  // Show toast confirmation
+  const toast=document.createElement("div");
+  toast.textContent=name+" added — it will appear in your itinerary builder";
+  toast.style.cssText="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--gray-900);color:#fff;font-size:12px;padding:10px 18px;border-radius:var(--radius-md);z-index:9999;opacity:0;transition:opacity .3s;max-width:320px;text-align:center";
+  document.body.appendChild(toast);
+  requestAnimationFrame(function(){toast.style.opacity="1";});
+  setTimeout(function(){toast.style.opacity="0";setTimeout(function(){toast.remove();},300);},3000);
+}
+
 async function loadEvents(){
   const evEl=document.getElementById("eventsSection");
   if(!evEl)return;
@@ -988,8 +1026,16 @@ function renderEvents(events){
   // Build events HTML using DOM to avoid template literal nesting issues
   evEl.innerHTML="";
   const evWrap=document.createElement("div");
+  const destForTickets=encodeURIComponent(destination.split(",")[0].trim());
   evWrap.innerHTML='<div style="margin-bottom:.75rem">'
-    +'<div class="section-label" style="margin:0 0 4px">Events &amp; experiences during your stay</div>'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:4px">'
+    +'<div class="section-label" style="margin:0">Events &amp; experiences during your stay</div>'
+    +'<div style="display:flex;gap:6px;align-items:center">'
+    +'<span style="font-size:11px;color:var(--gray-400)">Book tickets:</span>'
+    +'<a href="https://www.stubhub.com/'+destForTickets+'-tickets/" target="_blank" rel="noopener" style="font-size:11px;font-weight:500;color:var(--blue-600);text-decoration:none;background:var(--blue-50);border:1px solid var(--blue-100);border-radius:var(--radius-sm);padding:3px 9px">StubHub</a>'
+    +'<a href="https://www.eventbrite.com/d/'+destForTickets.toLowerCase()+'/events/" target="_blank" rel="noopener" style="font-size:11px;font-weight:500;color:#F05537;text-decoration:none;background:#FEF0ED;border:1px solid #F9C4B3;border-radius:var(--radius-sm);padding:3px 9px">Eventbrite</a>'
+    +'<a href="https://www.ticketmaster.com/search?q='+destForTickets+'" target="_blank" rel="noopener" style="font-size:11px;font-weight:500;color:#003f8f;text-decoration:none;background:#E8EEF8;border:1px solid #B3C5E8;border-radius:var(--radius-sm);padding:3px 9px">Ticketmaster</a>'
+    +'</div></div>'
     +'<div style="font-size:12px;color:var(--gray-400)">Happening in '+destination.split(",")[0]+' &middot; '+formatDate(dateFrom)+' &ndash; '+formatDate(dateTo)+'</div>'
     +'</div>';
   evEl.appendChild(evWrap);
@@ -1002,24 +1048,18 @@ function renderEvents(events){
     card.style.cssText="background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius-md);padding:1rem";
     const priceHtml=ev.price?'<div style="font-size:12px;font-weight:500;color:var(--teal-600);white-space:nowrap">'+convertEventPrice(ev.price)+'</div>':"";
     const venueHtml=ev.venue?" &middot; "+ev.venue:"";
-    const destCity2=destination.split(",")[0].trim();
-    const eventSearch=encodeURIComponent(ev.name);
-    const ebUrl="https://www.eventbrite.com/d/"+encodeURIComponent(destCity2.toLowerCase().replace(/\s+/g,"-"))+"/events/?q="+eventSearch;
-    const shUrl="https://www.stubhub.com/find/s/?q="+encodeURIComponent(ev.name+" "+destCity2);
-    const tmUrl="https://www.ticketmaster.com/search?q="+encodeURIComponent(ev.name+" "+destCity2);
-    const ticketLinks='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">'
-      +'<a href="'+shUrl+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#fff;background:#185FA5;border-radius:var(--radius-sm);padding:4px 10px;text-decoration:none;font-weight:500">StubHub</a>'
-      +'<a href="'+ebUrl+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#F05537;background:#FEF0ED;border:1px solid #F9C4B3;border-radius:var(--radius-sm);padding:4px 10px;text-decoration:none;font-weight:500">Eventbrite</a>'
-      +'<a href="'+tmUrl+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#003f8f;background:#E8EEF8;border:1px solid #B3C5E8;border-radius:var(--radius-sm);padding:4px 10px;text-decoration:none;font-weight:500">Ticketmaster</a>'
-      +'</div>';
+
+    const addBtnId="ev-add-"+i;
     card.innerHTML='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px">'
       +'<div style="flex:1">'
       +'<span style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;'+tc+';border:1px solid;border-radius:4px;padding:2px 7px;display:inline-block;margin-bottom:5px">'+ev.type+'</span>'
       +'<div style="font-size:15px;font-weight:500;color:var(--gray-900)">'+ev.name+'</div>'
       +'</div>'+priceHtml+'</div>'
       +'<div style="font-size:12px;color:var(--gray-400);margin-bottom:4px">'+ev.date+venueHtml+'</div>'
-      +'<div style="font-size:13px;color:var(--gray-600);line-height:1.5;margin-bottom:4px">'+ev.desc+'</div>'
-      +ticketLinks;
+      +'<div style="font-size:13px;color:var(--gray-600);line-height:1.5;margin-bottom:10px">'+ev.desc+'</div>'
+      +'<button id="'+addBtnId+'" onclick="addEventToItinerary(this,\''+ev.name.replace(/'/g,"")+ '\',\''+ev.type+'\',\''+ev.date+'\')" style="font-size:11px;font-weight:500;color:var(--teal-600);background:var(--teal-50);border:1px solid var(--teal-100);border-radius:var(--radius-sm);padding:5px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:4px">'
+      +'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>'
+      +' Add to my itinerary</button>';
     evList.appendChild(card);
   });
   evEl.appendChild(evList);
@@ -1330,20 +1370,33 @@ let selectedPlaceDetails=null;
 
 function initPlacesAutocomplete(){
   const input=document.getElementById("customSpotInput");
-  if(!input||!window.google||!google.maps||!google.maps.places)return;
-  placesAutocomplete=new google.maps.places.Autocomplete(input,{
-    types:["establishment","geocode"],
-    fields:["name","formatted_address","geometry","types","url"]
-  });
-  placesAutocomplete.addListener("place_changed",function(){
-    const place=placesAutocomplete.getPlace();
-    if(!place||!place.name)return;
-    selectedPlaceDetails=place;
-    // Show full name + address in input
-    if(place.formatted_address){
-      input.value=place.name+", "+place.formatted_address;
-    }
-  });
+  if(!input)return;
+  // Suppress Google Maps error popups
+  window.gm_authFailure=function(){
+    console.warn("Google Maps auth failed — falling back to plain text input");
+  };
+  if(!window.google||!google.maps||!google.maps.places){
+    // Graceful fallback: plain text input still works fine
+    return;
+  }
+  try{
+    placesAutocomplete=new google.maps.places.Autocomplete(input,{
+      types:["establishment","geocode"],
+      fields:["name","formatted_address","geometry","types","url"]
+    });
+    placesAutocomplete.addListener("place_changed",function(){
+      try{
+        const place=placesAutocomplete.getPlace();
+        if(!place||!place.name)return;
+        selectedPlaceDetails=place;
+        if(place.formatted_address){
+          input.value=place.name+", "+place.formatted_address;
+        }
+      }catch(e){}
+    });
+  }catch(e){
+    console.warn("Places autocomplete unavailable:",e.message);
+  }
 }
 
 // Retry init after confirm screen appears (DOM loaded later)
