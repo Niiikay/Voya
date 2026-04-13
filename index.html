@@ -722,7 +722,6 @@ function enterApp(name, pic, method){
   }
   if(!getKey()) document.getElementById("apiModal").classList.remove("hidden");
   // Restore last search if returning user
-  setTimeout(restoreLastSearch, 100);
   setTimeout(renderRecentTrips, 150);
 }
 
@@ -1898,7 +1897,7 @@ function restart(){
   SUB_INTERESTS.forEach(function(cat){cat.items.forEach(function(item){document.getElementById("sub-"+item.id)?.classList.remove("selected");});});
   selInterests=[];selSubs=[];
   // Restore last search and show recent trips
-  setTimeout(function(){restoreLastSearch();renderRecentTrips();},50);
+  setTimeout(renderRecentTrips, 50);
 }
 </script>
 </body>
