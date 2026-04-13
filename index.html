@@ -446,7 +446,7 @@
         <div style="font-size:12px;color:var(--gray-400);margin-bottom:10px">Know a place you want to visit that's not listed? Add it here.</div>
         <div style="position:relative">
           <div style="display:flex;gap:8px;align-items:center">
-            <input type="text" id="customSpotInput" placeholder="e.g. Sea World, San Diego" autocomplete="off" style="flex:1;font-size:14px;padding:9px 12px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);background:var(--gray-50);outline:none"/>
+            <input type="text" id="customSpotInput" placeholder="e.g. Sea World, San Diego" autocomplete="off" onkeydown="if(event.key==='Enter')addCustomSpot()" style="flex:1;font-size:14px;padding:9px 12px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);background:var(--gray-50);outline:none"/>
             <button onclick="addCustomSpot()" style="padding:9px 16px;background:var(--blue-600);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap">Add</button>
           </div>
           <div style="font-size:11px;color:var(--gray-400);margin-top:4px">Type the place name and city (e.g. Sea World, San Diego)</div>
@@ -1370,23 +1370,12 @@ function ensurePlacesAutocomplete(){}
 function addCustomSpot(){
   const input=document.getElementById("customSpotInput");
   const val=input.value.trim();
-  if(!val)return;
-  let name=val;
-  let neighborhood=destination.split(",")[0];
-  let mapsUrl=null;
-  // Use Places data if available
-  if(selectedPlaceDetails&&selectedPlaceDetails.name){
-    name=selectedPlaceDetails.name;
-    if(selectedPlaceDetails.formatted_address){
-      name=selectedPlaceDetails.name+" — "+selectedPlaceDetails.formatted_address.split(",").slice(0,2).join(",").trim();
-      neighborhood=selectedPlaceDetails.formatted_address.split(",")[1]?.trim()||neighborhood;
-    }
-    if(selectedPlaceDetails.url)mapsUrl=selectedPlaceDetails.url;
-    selectedPlaceDetails=null;
-  }
-  const spot={name:name,type:"experience",tag:"custom",desc:"Added by you",score:8,mustVisit:false,confirmed:true,neighborhood:neighborhood,isCustom:true,mapsUrl:mapsUrl};
+  if(!val){input.focus();return;}
+  const neighborhood=val.includes(",")?val.split(",").slice(1).join(",").trim():destination.split(",")[0];
+  const spot={name:val,type:"experience",tag:"custom",desc:"Added by you",score:8,mustVisit:false,confirmed:true,neighborhood:neighborhood,isCustom:true};
   customSpots.push(spot);
   input.value="";
+  input.focus();
   renderCustomSpots();
 }
 
@@ -1659,7 +1648,6 @@ function renderItinerary(){
     const label=d.toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric"});
     const tempStr=day.tempHigh&&day.tempLow?day.tempHigh+" / "+day.tempLow:"";
     const totalSpots=(day.morning?day.morning.length:0)+(day.afternoon?day.afternoon.length:0)+(day.evening?day.evening.length:0);
-    const isFirst=di===0;
     const chevron='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>';
     const block=document.createElement("div");
     block.className="day-block";
@@ -1669,9 +1657,9 @@ function renderItinerary(){
       +'<div class="day-title">Day '+day.day+' &mdash; '+label+' <span style="font-size:12px;color:var(--gray-400);font-weight:400">'+(day.theme||"")+'</span></div>'
       +'<div style="font-size:11px;color:var(--gray-400);margin-top:2px">'+(tempStr?tempStr+' &middot; ':"")+totalSpots+' stop'+(totalSpots!==1?'s':'')+'</div>'
       +'</div>'
-      +'<div class="day-toggle'+(isFirst?' open':'')+'" id="toggle-'+di+'">'+chevron+'</div>'
+      +'<div class="day-toggle" id="toggle-'+di+'">'+chevron+'</div>'
       +'</div>'
-      +'<div class="day-content'+(isFirst?' open':'')+'" id="daycontent-'+di+'">'
+      +'<div class="day-content" id="daycontent-'+di+'">'
       +buildSlotHtml(day.morning,"Morning","morning",di)
       +buildSlotHtml(day.afternoon,"Afternoon","afternoon",di)
       +buildSlotHtml(day.evening,"Evening","evening",di)
