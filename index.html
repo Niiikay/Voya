@@ -923,6 +923,7 @@ Include exactly ${m1SpotCount} spots. Score 1-10 (8+ = mustVisit true). Be speci
     const d=await r.json();if(d.error)throw new Error(d.error.message);
     result=JSON.parse(d.choices[0].message.content.replace(/```json|```/g,"").trim());
     clearInterval(loadingInterval);renderResults();
+    saveLastSearch(); // Save with result immediately after analysis
     setTimeout(()=>loadSpotPhotos(result.spots||[]),400);
     setTimeout(()=>loadOpeningHours(result.spots||[]),800);
     setTimeout(()=>loadEvents(),600);
@@ -1732,7 +1733,7 @@ function buildShareText(){
 function saveLastSearch(){
   if(!destination)return;
   try{
-    const search={flyingFrom,destination,dateFrom,dateTo,selInterests,savedAt:Date.now()};
+    const search={flyingFrom,destination,dateFrom,dateTo,selInterests,savedAt:Date.now(),result:result||null};
     // Save to history (up to 4 recent trips)
     let history=[];
     try{history=JSON.parse(localStorage.getItem("voya_history")||"[]");}catch(e){}
@@ -1740,7 +1741,11 @@ function saveLastSearch(){
     history=history.filter(function(h){return h.destination!==destination;});
     history.unshift(search);
     history=history.slice(0,4);
-    localStorage.setItem("voya_history",JSON.stringify(history));
+    try{localStorage.setItem("voya_history",JSON.stringify(history));}catch(e){
+      // If too large (result data), save without result
+      const slim=history.map(function(h){return{flyingFrom:h.flyingFrom,destination:h.destination,dateFrom:h.dateFrom,dateTo:h.dateTo,selInterests:h.selInterests,savedAt:h.savedAt};});
+      localStorage.setItem("voya_history",JSON.stringify(slim));
+    }
     localStorage.setItem("voya_last_search",JSON.stringify(search));
   }catch(e){}
 }
@@ -1817,20 +1822,43 @@ function renderRecentTrips(){
 
 function loadRecentTrip(h){
   try{
+    // Restore state variables
+    flyingFrom=h.flyingFrom||"";
+    destination=h.destination||"";
+    dateFrom=h.dateFrom||"";
+    dateTo=h.dateTo||"";
+    selInterests=h.selInterests||[];
+
+    // Restore form fields
     if(h.flyingFrom)document.getElementById("flyingFrom").value=h.flyingFrom;
     if(h.destination)document.getElementById("dest").value=h.destination;
     if(h.dateFrom)document.getElementById("dateFrom").value=h.dateFrom;
     if(h.dateTo)document.getElementById("dateTo").value=h.dateTo;
-    if(h.selInterests&&h.selInterests.length){
-      selInterests=h.selInterests;
-      selInterests.forEach(function(id){
-        const card=document.getElementById("card-"+id);
-        if(card)card.classList.add("selected");
-      });
-    }
+    selInterests.forEach(function(id){
+      const card=document.getElementById("card-"+id);
+      if(card)card.classList.add("selected");
+    });
     validateStep0();
-    // Scroll to form
-    document.getElementById("flyingFrom").focus();
+
+    if(h.result){
+      // We have a saved result — jump straight to Plan your days (M2 Step A)
+      result=h.result;
+      confirmedSpots=(result.spots||[]).map(function(s){return Object.assign({},s,{confirmed:true});});
+      customSpots=[];
+      // Hide step0, show m2stepA directly
+      document.getElementById("step0").style.display="none";
+      document.getElementById("step2").style.display="none";
+      document.getElementById("m2stepA").style.display="block";
+      document.getElementById("m2stepB").style.display="none";
+      document.getElementById("m2stepC").style.display="none";
+      // Set wordmark destination
+      const ld=document.getElementById("itinLoadDest");
+      if(ld)ld.textContent=destination;
+    } else {
+      // No saved result — re-run the analysis
+      document.getElementById("step0").style.display="none";
+      analyze();
+    }
   }catch(e){console.error(e);}
 }
 
