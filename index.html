@@ -344,7 +344,7 @@
 
     <!-- M1: Step 0 - Trip details -->
     <div id="step0">
-      <div class="wordmark"><div style="display:flex;align-items:center;gap:8px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue-600)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg><span>VOYA</span></div><button class="settings-btn" onclick="document.getElementById('apiModal').classList.remove('hidden')">Change API key</button></div>
+      <div class="wordmark"><div style="display:flex;align-items:center;gap:8px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue-600)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg><span>VOYA</span></div><div style="display:flex;align-items:center;gap:12px"><button class="settings-btn" onclick="document.getElementById('apiModal').classList.remove('hidden')">Change API key</button><button class="settings-btn" onclick="logout()" style="color:#C62828;display:flex;align-items:center;gap:4px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign out</button></div></div>
       <div class="dots"><div class="dot-active"></div><div class="dot"></div><div class="dot"></div></div>
       <div id="recentTripsSection" class="recent-trips" style="display:none"></div>
       <h1 class="heading">Where are you headed?</h1>
@@ -369,7 +369,7 @@
 
     <!-- M1: Step 1 - Interests -->
     <div id="step1" style="display:none">
-      <div class="wordmark"><div style="display:flex;align-items:center;gap:8px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue-600)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg><span>VOYA</span></div></div>
+      <div class="wordmark"><div style="display:flex;align-items:center;gap:8px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue-600)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg><span>VOYA</span></div><button class="settings-btn" onclick="logout()" style="color:#C62828;display:flex;align-items:center;gap:4px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign out</button></div>
       <div class="dots"><div class="dot"></div><div class="dot-active"></div><div class="dot"></div></div>
       <button class="btn-ghost" onclick="goToStep0()">&#8592; Back</button>
       <h1 class="heading">What moves you?</h1>
@@ -380,7 +380,7 @@
 
     <!-- M1: Step 2 - Results -->
     <div id="step2" style="display:none">
-      <div class="wordmark"><div style="display:flex;align-items:center;gap:8px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue-600)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg><span>VOYA</span></div></div>
+      <div class="wordmark"><div style="display:flex;align-items:center;gap:8px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue-600)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg><span>VOYA</span></div><button class="settings-btn" onclick="logout()" style="color:#C62828;display:flex;align-items:center;gap:4px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign out</button></div>
       <div id="loadingView" class="loading-screen">
         <div class="loading-dest" id="loadingDest"></div>
         <div class="spinner"></div>
@@ -391,7 +391,7 @@
 
     <!-- M2: Step A - Sub-interests + pace + style -->
     <div id="m2stepA" style="display:none">
-      <div class="wordmark"><div style="display:flex;align-items:center;gap:8px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue-600)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg><span>VOYA</span></div></div>
+      <div class="wordmark"><div style="display:flex;align-items:center;gap:8px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue-600)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg><span>VOYA</span></div><button class="settings-btn" onclick="logout()" style="color:#C62828;display:flex;align-items:center;gap:4px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign out</button></div>
       <button class="btn-ghost" onclick="backToResults()">&#8592; Back to spots</button>
       <h1 class="heading">Plan your days</h1>
       <p class="subtext">Tell us what each day should feel like — we'll build your itinerary around it.</p>
@@ -436,7 +436,7 @@
 
     <!-- M2: Step B - Confirm spots -->
     <div id="m2stepB" style="display:none">
-      <div class="wordmark"><div style="display:flex;align-items:center;gap:8px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue-600)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg><span>VOYA</span></div></div>
+      <div class="wordmark"><div style="display:flex;align-items:center;gap:8px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue-600)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg><span>VOYA</span></div><button class="settings-btn" onclick="logout()" style="color:#C62828;display:flex;align-items:center;gap:4px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign out</button></div>
       <button class="btn-ghost" onclick="document.getElementById('m2stepA').style.display='block';document.getElementById('m2stepB').style.display='none'">&#8592; Back</button>
       <h1 class="heading">Confirm your spots</h1>
       <p class="subtext">These are your AI-suggested spots. Uncheck any you'd like to skip — we'll build your schedule around what's left.</p>
@@ -700,6 +700,8 @@ function handleGoogleSignIn(response){
 function enterApp(name, pic, method){
   document.getElementById("loginScreen").classList.remove("active");
   document.getElementById("appScreen").classList.add("active");
+  // Push state so back button is intercepted
+  history.pushState({loggedIn:true},"",window.location.href);
   // Pre-set Pexels key
   if(!localStorage.getItem("voya_pexels_key")){
     localStorage.setItem("voya_pexels_key","beCjJsA7wLoBjidL3f3QrhyAZl7xDDMpwvH66ki70Kf1d13znpIUG2sk");
@@ -736,6 +738,17 @@ function doLogin(){
   }
 }
 document.addEventListener("keydown",e=>{if(e.key==="Enter"&&document.getElementById("loginScreen").classList.contains("active"))doLogin();});
+
+// Block forward/back navigation bypassing login
+window.addEventListener("popstate",function(e){
+  const isLoggedIn=!!localStorage.getItem("voya_user");
+  if(!isLoggedIn){
+    // Not logged in — force back to login screen
+    document.getElementById("appScreen").classList.remove("active");
+    document.getElementById("loginScreen").classList.add("active");
+    history.replaceState(null,"",window.location.href);
+  }
+});
 
 // Auto-login if returning user
 window.addEventListener("load",()=>{
@@ -1728,6 +1741,29 @@ function buildShareText(){
 }
 
 
+
+function logout(){
+  // Clear session
+  localStorage.removeItem("voya_user");
+  // Reset all app state
+  flyingFrom="";destination="";dateFrom="";dateTo="";selInterests=[];
+  result=null;selSubs=[];confirmedSpots=[];itinerary=null;customSpots=[];
+  // Clear form fields
+  ["flyingFrom","dest","dateFrom","dateTo"].forEach(function(id){
+    const el=document.getElementById(id);if(el)el.value="";
+  });
+  // Remove user chip from wordmark
+  document.querySelectorAll(".user-chip").forEach(function(el){el.remove();});
+  // Hide all app steps, show login
+  document.getElementById("appScreen").classList.remove("active");
+  document.getElementById("loginScreen").classList.add("active");
+  // Clear login fields
+  const lu=document.getElementById("loginUser");if(lu)lu.value="";
+  const lp=document.getElementById("loginPass");if(lp)lp.value="";
+  const le=document.getElementById("loginError");if(le)le.style.display="none";
+  // Replace browser history entry so back/forward can't bypass login
+  history.replaceState(null,"",window.location.href);
+}
 
 function saveLastSearch(){
   if(!destination)return;
