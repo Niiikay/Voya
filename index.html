@@ -1003,19 +1003,15 @@ function renderEvents(events){
     const priceHtml=ev.price?'<div style="font-size:12px;font-weight:500;color:var(--teal-600);white-space:nowrap">'+convertEventPrice(ev.price)+'</div>':"";
     const venueHtml=ev.venue?" &middot; "+ev.venue:"";
     const destCity2=destination.split(",")[0].trim();
-    const eventSearch=encodeURIComponent(ev.name+" "+destCity2);
-    const ebUrl="https://www.eventbrite.com/d/"+encodeURIComponent(destCity2.toLowerCase())+"/"+eventSearch;
-    const shUrl="https://www.stubhub.com/find/s/?q="+eventSearch;
-    const googleEvUrl="https://www.google.com/search?q="+eventSearch+"+tickets";
-    const ticketLinks=ev.type==="sports"||ev.type==="concert"
-      ?'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">'
-        +'<a href="'+shUrl+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#fff;background:#185FA5;border-radius:var(--radius-sm);padding:4px 10px;text-decoration:none;font-weight:500">Tickets on StubHub</a>'
-        +'<a href="'+ebUrl+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#F05537;background:#FEF0ED;border:1px solid #F9C4B3;border-radius:var(--radius-sm);padding:4px 10px;text-decoration:none;font-weight:500">Eventbrite</a>'
-        +'</div>'
-      :'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">'
-        +'<a href="'+ebUrl+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#F05537;background:#FEF0ED;border:1px solid #F9C4B3;border-radius:var(--radius-sm);padding:4px 10px;text-decoration:none;font-weight:500">Find on Eventbrite</a>'
-        +'<a href="'+googleEvUrl+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--blue-600);background:var(--blue-50);border:1px solid var(--blue-100);border-radius:var(--radius-sm);padding:4px 10px;text-decoration:none;font-weight:500">Search tickets</a>'
-        +'</div>';
+    const eventSearch=encodeURIComponent(ev.name);
+    const ebUrl="https://www.eventbrite.com/d/"+encodeURIComponent(destCity2.toLowerCase().replace(/\s+/g,"-"))+"/events/?q="+eventSearch;
+    const shUrl="https://www.stubhub.com/find/s/?q="+encodeURIComponent(ev.name+" "+destCity2);
+    const tmUrl="https://www.ticketmaster.com/search?q="+encodeURIComponent(ev.name+" "+destCity2);
+    const ticketLinks='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">'
+      +'<a href="'+shUrl+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#fff;background:#185FA5;border-radius:var(--radius-sm);padding:4px 10px;text-decoration:none;font-weight:500">StubHub</a>'
+      +'<a href="'+ebUrl+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#F05537;background:#FEF0ED;border:1px solid #F9C4B3;border-radius:var(--radius-sm);padding:4px 10px;text-decoration:none;font-weight:500">Eventbrite</a>'
+      +'<a href="'+tmUrl+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#003f8f;background:#E8EEF8;border:1px solid #B3C5E8;border-radius:var(--radius-sm);padding:4px 10px;text-decoration:none;font-weight:500">Ticketmaster</a>'
+      +'</div>';
     card.innerHTML='<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px">'
       +'<div style="flex:1">'
       +'<span style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;'+tc+';border:1px solid;border-radius:4px;padding:2px 7px;display:inline-block;margin-bottom:5px">'+ev.type+'</span>'
@@ -1777,7 +1773,16 @@ function renderRecentTrips(){
 
     const img=document.createElement("img");
     img.className="recent-card-img";
-    img.src="https://source.unsplash.com/featured/400x180/?"+encodeURIComponent(city+",travel");
+    const pexKey=localStorage.getItem("voya_pexels_key")||"beCjJsA7wLoBjidL3f3QrhyAZl7xDDMpwvH66ki70Kf1d13znpIUG2sk";
+    img.src="https://images.pexels.com/photos/1769409/pexels-photo-1769409.jpeg?auto=compress&cs=tinysrgb&w=400&h=180&dpr=1";
+    // Fetch real city photo from Pexels
+    fetch("https://api.pexels.com/v1/search?query="+encodeURIComponent(city+" city travel")+"&per_page=1&orientation=landscape",{headers:{Authorization:pexKey}})
+      .then(function(r){return r.json();})
+      .then(function(data){
+        if(data.photos&&data.photos[0]){
+          img.src=data.photos[0].src.medium||data.photos[0].src.large;
+        }
+      }).catch(function(){});
     img.alt=city;
     card.appendChild(img);
 
